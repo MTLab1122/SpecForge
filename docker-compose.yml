@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: specforge-app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-specforge_secure_pass}@db:5432/specforge?schema=public
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-specforge_super_secure_nextauth_secret_key_12345}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-0123456789abcdef0123456789abcdef}
+      - AI_LLM_API_KEY=${AI_LLM_API_KEY}
+      - AI_TRANSCRIPTION_API_KEY=${AI_TRANSCRIPTION_API_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - specforge-net
+
+  db:
+    image: postgres:16-alpine
+    container_name: specforge-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-specforge_secure_pass}
+      POSTGRES_DB: specforge
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d specforge"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - specforge-net
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  specforge-net:
+    driver: bridge

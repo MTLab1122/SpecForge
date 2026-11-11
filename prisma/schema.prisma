@@ -1,0 +1,2231 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ---------------------------------------------------------
+// ENUMS
+// ---------------------------------------------------------
+
+enum UserType {
+  FREELANCER
+  AGENCY
+  PRODUCT_MANAGER
+  CONSULTANT
+}
+
+enum PrimaryGoal {
+  FASTER_PROPOSALS
+  BETTER_ESTIMATES
+  SCOPE_CONTROL
+  CLIENT_APPROVAL
+}
+
+enum OrgRole {
+  OWNER
+  ADMIN
+  MANAGER
+  EDITOR
+  REVIEWER
+  VIEWER
+  CLIENT
+}
+
+enum SubscriptionTier {
+  TRIAL
+  PROFESSIONAL // PKR 3,500/mo ($12.50)
+  AGENCY       // PKR 9,500/mo ($34.00)
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+}
+
+enum ProjectStatus {
+  DRAFT
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  ARCHIVED
+}
+
+enum ProjectStage {
+  DISCOVERY
+  REQUIREMENTS_EXTRACTED
+  SCOPE_DRAFTED
+  ESTIMATION
+  PROPOSAL_SENT
+  CLIENT_APPROVED
+  TASK_DELIVERY
+  COMPLETED
+}
+
+enum DocumentType {
+  PASTED_TEXT
+  PDF
+  DOCX
+  MEETING_NOTES
+  AUDIO_VOICE_NOTE
+}
+
+enum ProcessingStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum ItemProvenance {
+  AI_SUGGESTION
+  USER_CONFIRMED
+}
+
+enum PriorityLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ComplexityLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ConfidenceLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum MoscowPriority {
+  MUST
+  SHOULD
+  COULD
+  WONT
+}
+
+enum ReviewState {
+  REVIEW_REQUIRED
+  ACCEPTED
+  EDITED
+  REJECTED
+  MARKED_AS_ASSUMPTION
+}
+
+enum ConflictType {
+  CONTRADICTION
+  DUPLICATE_FEATURE
+  MISSING_ACCEPTANCE_CRITERIA
+  UNCLEAR_USER_ROLE
+  MISSING_CONSTRAINT
+  CONFLICTING_ASSUMPTION
+}
+
+enum ExtractionQualityMode {
+  FAST
+  BALANCED
+  THOROUGH
+}
+
+enum ClarificationStatus {
+  DRAFT
+  SENT_TO_CLIENT
+  ANSWERED
+  INTEGRATED
+}
+
+enum AiFeedbackRating {
+  HELPFUL
+  PARTIALLY_HELPFUL
+  NOT_HELPFUL
+}
+
+enum PricingType {
+  HOURLY_RATE
+  FIXED_PRICE
+  TIME_AND_MATERIALS
+  RETAINER
+  MVP_FIXED
+  MAINTENANCE
+  DISCOVERY_PHASE
+}
+
+enum EstimateApprovalStatus {
+  DRAFT
+  INTERNAL_REVIEW
+  MANAGER_APPROVED
+  CLIENT_APPROVED
+  REJECTED
+  REVISED
+}
+
+enum EstimateScenarioType {
+  OPTIMISTIC
+  REALISTIC
+  CONSERVATIVE
+  CUSTOM
+}
+
+enum EstimateCategory {
+  FEATURE
+  TASK
+  DESIGN
+  DEVELOPMENT
+  QA
+  DEPLOYMENT
+  PROJECT_MANAGEMENT
+  BUFFER
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  VOID
+}
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  VIEWED
+  REVISED
+  APPROVED
+  REJECTED
+}
+
+enum ClientApprovalType {
+  FULL_SCOPE
+  SECTIONAL
+}
+
+enum SectionApprovalStatus {
+  PENDING
+  APPROVED
+  CHANGES_REQUESTED
+}
+
+enum DelegationStatus {
+  ACTIVE
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+enum ClientUpdateType {
+  WEEKLY_DIGEST
+  MILESTONE_COMPLETED
+  DELIVERABLE_READY
+  CHANGE_REQUEST
+}
+
+enum ApprovalAction {
+  APPROVE
+  REQUEST_REVISION
+  REJECT
+  COMMENT
+}
+
+enum TaskStatus {
+  BACKLOG
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+  BLOCKED
+}
+
+enum ChangeRequestStatus {
+  DRAFT
+  PENDING_CLIENT_APPROVAL
+  APPROVED
+  REJECTED
+  SUPERSEDED
+}
+
+enum IntegrationProvider {
+  JIRA
+  LINEAR
+  TRELLO
+  GITHUB
+  SLACK
+  NOTION
+}
+
+enum SyncStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  RETRYING
+}
+
+enum WebhookEventType {
+  PROJECT_CREATED
+  SCOPE_APPROVED
+  ESTIMATE_CREATED
+  PROPOSAL_SENT
+  PROPOSAL_APPROVED
+  CHANGE_REQUEST_CREATED
+  CHANGE_REQUEST_APPROVED
+  TASK_CREATED
+  MILESTONE_COMPLETED
+}
+
+enum IntegrationStatus {
+  CONNECTED
+  DISCONNECTED
+  ERROR
+}
+
+enum AuditAction {
+  USER_REGISTERED
+  WORKSPACE_CREATED
+  MEMBER_INVITED
+  MEMBER_REMOVED
+  ROLE_UPDATED
+  CLIENT_CREATED
+  PROJECT_CREATED
+  DOCUMENT_UPLOADED
+  AUDIO_TRANSCRIBED
+  REQUIREMENTS_EXTRACTED
+  REQUIREMENT_UPDATED
+  SCOPE_VERSION_CREATED
+  ESTIMATE_GENERATED
+  ESTIMATE_UPDATED
+  PROPOSAL_CREATED
+  PROPOSAL_SENT
+  PROPOSAL_VIEWED
+  PROPOSAL_APPROVED
+  PROPOSAL_REJECTED
+  TASKS_GENERATED
+  TASKS_EXPORTED
+  CHANGE_REQUEST_CREATED
+  CHANGE_REQUEST_APPROVED
+  INTEGRATION_CONNECTED
+  INTEGRATION_DISCONNECTED
+  SUBSCRIPTION_UPDATED
+  CREDIT_TOPPED_UP
+  PORTAL_ACCESSED
+}
+
+// ---------------------------------------------------------
+// 1. ORGANIZATIONS (TENANTS)
+// ---------------------------------------------------------
+model Organization {
+  id                   String             @id @default(uuid())
+  name                 String
+  slug                 String             @unique
+  logoUrl              String?
+  brandColor           String?            @default("#2563eb")
+  customDomain         String?            @unique
+  dataRetentionDays    Int                @default(365)
+  subscriptionTier     SubscriptionTier   @default(TRIAL)
+  subscriptionStatus   SubscriptionStatus @default(TRIALING)
+  stripeCustomerId     String?            @unique
+  subscriptionExpiresAt DateTime?
+  monthlyAiCreditQuota Int                @default(250) // Pro=250, Agency=1000
+  currentAiCreditUsage Int                @default(0)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  members              OrganizationMember[]
+  invitations          Invitation[]
+  clients              Client[]
+  projects             Project[]
+  rateCards            RateCard[]
+  templates            Template[]
+  integrations         Integration[]
+  webhookSubscriptions WebhookSubscription[]
+  aiUsageLogs          AiUsage[]
+  creditTopUps         CreditTopUp[]
+  auditLogs            AuditLog[]
+  activityItems        ActivityFeedItem[]
+  scheduledReports     ScheduledReportConfig[]
+  analyticsSnapshots   AnalyticsSnapshot[]
+  userSessions         UserSession[]
+  backgroundJobs       BackgroundJob[]
+  backupSnapshots      DatabaseBackupSnapshot[]
+  idempotencyRecords   IdempotencyRecord[]
+  supportTickets       SupportTicket[]
+  transcriptionJobs    AudioTranscriptionJob[]
+
+  @@map("organizations")
+}
+
+// ---------------------------------------------------------
+// 2. USERS
+// ---------------------------------------------------------
+model User {
+  id                   String                 @id @default(uuid())
+  email                String                 @unique
+  passwordHash         String
+  fullName             String
+  avatarUrl            String?
+  isEmailVerified      Boolean                @default(false)
+  emailVerifyToken     String?
+  passwordResetToken   String?
+  passwordResetExpires DateTime?
+  preferredLocale      String                 @default("en") // 'en' or 'ur'
+  onboardingStep       Int                    @default(0)    // 0 = pending, 5 = completed
+  hasSeenSandboxDemo   Boolean                @default(false)
+  // Enhanced Authentication & Reliability Fields
+  mfaSecret            String?                // AES-256-GCM encrypted TOTP secret
+  mfaEnabled           Boolean                @default(false)
+  mfaBackupCodes       String[]               @default([]) // Hashed backup recovery codes
+  failedLoginAttempts  Int                    @default(0)
+  lockoutUntil         DateTime?
+  lastPasswordChangeAt DateTime?
+  isDeleted            Boolean                @default(false)
+  deletedAt            DateTime?
+  // Engagement & Retention Fields
+  currentWeeklyStreak  Int                    @default(1)
+  longestWeeklyStreak  Int                    @default(1)
+  lastActiveWeek       String?                // e.g. "2026-W08"
+  earnedBadges         String[]               @default([])
+  referralCode         String?                @unique
+  referredById         String?
+  isSuperAdmin         Boolean                @default(false)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+
+  organizationMembers  OrganizationMember[]
+  projectMembers       ProjectMember[]
+  createdInvitations   Invitation[]           @relation("InvitedByUser")
+  sourceDocuments      SourceDocument[]
+  approvals            Approval[]
+  clientComments       ClientComment[]
+  assignedTasks        Task[]                 @relation("AssignedToUser")
+  auditLogs            AuditLog[]
+  notifications        Notification[]
+  onboardingProfile    OnboardingProfile?
+  activationChecklist  ActivationChecklist?
+  resumeStates         ProjectResumeState[]
+  editedRequirements   Requirement[]          @relation("EditedRequirements")
+  createdScopeVersions ScopeVersion[]         @relation("VersionCreator")
+  aiFeedbacks          AiFeedback[]
+  projectComments        ProjectComment[]       @relation("CommentAuthor")
+  resolvedComments       ProjectComment[]       @relation("CommentResolver")
+  notificationPreference NotificationPreference?
+  activityItems          ActivityFeedItem[]     @relation("ActorUser")
+  presenceSessions       PresenceSession[]
+  estimatesApproved      Estimate[]             @relation("EstimateApprover")
+  userSessions           UserSession[]
+  userDevices            UserDevice[]
+  referralsCreated       Referral[]             @relation("ReferrerUser")
+  userNudges             UserNudge[]
+  feedbackSubmissions    FeedbackSubmission[]
+  supportTicketsCreated  SupportTicket[]        @relation("TicketCreator")
+  supportTicketsAssigned SupportTicket[]        @relation("TicketAssignee")
+  ticketMessages         SupportTicketMessage[]
+
+  @@map("users")
+}
+
+// ---------------------------------------------------------
+// 3. ORGANIZATION MEMBERS (RBAC & Multi-Tenancy)
+// ---------------------------------------------------------
+model OrganizationMember {
+  id             String       @id @default(uuid())
+  organizationId String
+  userId         String
+  role           OrgRole      @default(EDITOR)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@index([userId])
+  @@map("organization_members")
+}
+
+// ---------------------------------------------------------
+// 4. INVITATIONS
+// ---------------------------------------------------------
+model Invitation {
+  id             String       @id @default(uuid())
+  organizationId String
+  email          String
+  role           OrgRole      @default(EDITOR)
+  token          String       @unique
+  invitedById    String
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy      User         @relation("InvitedByUser", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([email])
+  @@map("invitations")
+}
+
+// ---------------------------------------------------------
+// 5. CLIENTS
+// ---------------------------------------------------------
+model Client {
+  id             String       @id @default(uuid())
+  organizationId String
+  name           String
+  companyName    String?
+  email          String
+  phone          String?
+  whatsappNumber String?
+  notes          String?
+  isArchived     Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projects       Project[]
+
+  @@index([organizationId])
+  @@index([email])
+  @@map("clients")
+}
+
+// ---------------------------------------------------------
+// 6. PROJECTS
+// ---------------------------------------------------------
+model Project {
+  id              String           @id @default(uuid())
+  organizationId  String
+  clientId        String?
+  name            String
+  description     String?
+  status          ProjectStatus    @default(ACTIVE)
+  stage           ProjectStage     @default(DISCOVERY)
+  targetBudget    Decimal?         @db.Decimal(12, 2)
+  currency        String           @default("USD")
+  targetDeadline  DateTime?
+  isSandboxDemo   Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  client          Client?          @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  members         ProjectMember[]
+  sourceDocuments SourceDocument[]
+  requirements    Requirement[]
+  features        Feature[]
+  assumptions     Assumption[]
+  exclusions      Exclusion[]
+  dependencies    Dependency[]
+  risks           Risk[]
+  estimates       Estimate[]
+  proposals       Proposal[]
+  milestones      Milestone[]
+  tasks           Task[]
+  changeRequests  ChangeRequest[]
+  attachments     Attachment[]
+  resumeStates    ProjectResumeState[]
+  scopeVersions         ScopeVersion[]
+  requirementConflicts  RequirementConflict[]
+  clarificationRequests ClarificationRequest[]
+  aiFeedbacks           AiFeedback[]
+  projectComments       ProjectComment[]
+  presenceSessions      PresenceSession[]
+  activityItems         ActivityFeedItem[]
+  discoveryQuestionnaire DiscoveryQuestionnaire?
+  userPersonas          UserPersona[]
+  userFlows             UserFlow[]
+  invoices              Invoice[]
+  estimateAccuracies    EstimateAccuracyRecord[]
+  clientProgressUpdates ClientProgressUpdate[]
+  taskSyncRecords       TaskExportSyncRecord[]
+
+  @@index([organizationId])
+  @@index([clientId])
+  @@index([status])
+  @@index([targetDeadline])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([organizationId, status])
+  @@index([organizationId, createdAt])
+  @@map("projects")
+}
+
+// ---------------------------------------------------------
+// 7. PROJECT MEMBERS
+// ---------------------------------------------------------
+model ProjectMember {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  role      String   @default("CONTRIBUTOR") // LEAD, ESTIMATOR, CONTRIBUTOR
+  createdAt DateTime @default(now())
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+  @@map("project_members")
+}
+
+// ---------------------------------------------------------
+// 8. SOURCE DOCUMENTS
+// ---------------------------------------------------------
+model SourceDocument {
+  id               String           @id @default(uuid())
+  projectId        String
+  uploadedById     String
+  name             String
+  docType          DocumentType
+  fileUrl          String?
+  fileSizeBytes    Int?
+  rawContent       String?          @db.Text
+  processingStatus ProcessingStatus @default(PENDING)
+  errorMessage     String?
+  metadata         Json?            // word count, audio length, mime-type
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  project          Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  uploadedBy       User             @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+  transcript       Transcript?
+
+  @@index([projectId])
+  @@map("source_documents")
+}
+
+// ---------------------------------------------------------
+// 9. TRANSCRIPTS
+// ---------------------------------------------------------
+model Transcript {
+  id               String           @id @default(uuid())
+  sourceDocumentId String           @unique
+  audioDurationSec Int              // Max 600s (10 min in MVP)
+  languageDetected String?          @default("en")
+  text             String           @db.Text
+  wordCount        Int              @default(0)
+  speakerLabels    Json?            // diarization if supported
+  status           ProcessingStatus @default(COMPLETED)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  sourceDocument   SourceDocument   @relation(fields: [sourceDocumentId], references: [id], onDelete: Cascade)
+
+  @@map("transcripts")
+}
+
+// ---------------------------------------------------------
+// 10. REQUIREMENTS (With Deep Citations & Grounding)
+// ---------------------------------------------------------
+model Requirement {
+  id                  String          @id @default(uuid())
+  projectId           String
+  category            String          // GOAL, USER_PERSONA, CONSTRAINT, DEPENDENCY, RISK, QUESTION
+  title               String
+  description         String          @db.Text
+  provenance          ItemProvenance  @default(AI_SUGGESTION)
+  reviewState         ReviewState     @default(REVIEW_REQUIRED)
+  confidenceLevel     ConfidenceLevel @default(MEDIUM)
+  moscow              MoscowPriority  @default(MUST)
+  businessValue       Int             @default(3)
+  complexityScore     Int             @default(3)
+  dependsOnIds        Json?
+  blocksIds           Json?
+  isAssumption        Boolean         @default(false)
+  assumptionConfirmed Boolean         @default(false)
+  reviewComments      String?         @db.Text
+  sourceCitation      String?         // snippet excerpt
+  citationStartOffset Int?            // char offset in source
+  citationEndOffset   Int?            // char offset in source
+  sourceDocumentId    String?         // specific source doc linkage
+  confidenceScore     Decimal?        @db.Decimal(3, 2) // 0.00 to 1.00
+  aiRationale         String?         @db.Text // explanation of why extracted
+  lastEditedById      String?
+  displayOrder        Int             @default(0)
+  isApproved          Boolean         @default(false)
+  version             Int             @default(1)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  project             Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  lastEditedBy        User?           @relation("EditedRequirements", fields: [lastEditedById], references: [id], onDelete: SetNull)
+
+  @@index([projectId, category])
+  @@index([projectId, reviewState])
+  @@map("requirements")
+}
+
+// ---------------------------------------------------------
+// 11. FEATURES
+// ---------------------------------------------------------
+model Feature {
+  id            String          @id @default(uuid())
+  projectId     String
+  title         String
+  description   String          @db.Text
+  priority      PriorityLevel   @default(MEDIUM)
+  provenance    ItemProvenance  @default(AI_SUGGESTION)
+  displayOrder  Int             @default(0)
+  version       Int             @default(1)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userStories   UserStory[]
+  estimateItems EstimateItem[]
+
+  @@index([projectId])
+  @@map("features")
+}
+
+// ---------------------------------------------------------
+// 12. USER STORIES
+// ---------------------------------------------------------
+model UserStory {
+  id                 String               @id @default(uuid())
+  featureId          String
+  asA                String
+  iWantTo            String
+  soThat             String
+  priority           PriorityLevel        @default(MEDIUM)
+  provenance         ItemProvenance       @default(AI_SUGGESTION)
+  displayOrder       Int                  @default(0)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  feature            Feature              @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  acceptanceCriteria AcceptanceCriteria[]
+  tasks              Task[]
+
+  @@index([featureId])
+  @@map("user_stories")
+}
+
+// ---------------------------------------------------------
+// 13. ACCEPTANCE CRITERIA
+// ---------------------------------------------------------
+model AcceptanceCriteria {
+  id           String         @id @default(uuid())
+  userStoryId  String
+  criteria     String         @db.Text
+  displayOrder Int            @default(0)
+  provenance   ItemProvenance @default(AI_SUGGESTION)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  userStory    UserStory      @relation(fields: [userStoryId], references: [id], onDelete: Cascade)
+
+  @@index([userStoryId])
+  @@map("acceptance_criteria")
+}
+
+// ---------------------------------------------------------
+// 14. ASSUMPTIONS
+// ---------------------------------------------------------
+model Assumption {
+  id          String         @id @default(uuid())
+  projectId   String
+  description String         @db.Text
+  provenance  ItemProvenance @default(AI_SUGGESTION)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("assumptions")
+}
+
+// ---------------------------------------------------------
+// 15. EXCLUSIONS (OUT OF SCOPE)
+// ---------------------------------------------------------
+model Exclusion {
+  id          String         @id @default(uuid())
+  projectId   String
+  description String         @db.Text
+  provenance  ItemProvenance @default(AI_SUGGESTION)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("exclusions")
+}
+
+// ---------------------------------------------------------
+// 16. DEPENDENCIES
+// ---------------------------------------------------------
+model Dependency {
+  id          String         @id @default(uuid())
+  projectId   String
+  description String         @db.Text
+  owner       String?        // e.g. "Client", "Third-Party Vendor", "Development Team"
+  provenance  ItemProvenance @default(AI_SUGGESTION)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("dependencies")
+}
+
+// ---------------------------------------------------------
+// 17. RISKS
+// ---------------------------------------------------------
+model Risk {
+  id             String         @id @default(uuid())
+  projectId      String
+  description    String         @db.Text
+  mitigationPlan String?        @db.Text
+  severity       PriorityLevel  @default(MEDIUM)
+  provenance     ItemProvenance @default(AI_SUGGESTION)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  project        Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("risks")
+}
+
+// ---------------------------------------------------------
+// 18. ESTIMATES (With Contingency & Historical Velocity)
+// ---------------------------------------------------------
+model Estimate {
+  id                      String                 @id @default(uuid())
+  projectId               String
+  rateCardId              String?
+  version                 Int                    @default(1)
+  pricingType             PricingType            @default(HOURLY_RATE)
+  currency                String                 @default("USD")
+  hourlyRate              Decimal?               @db.Decimal(10, 2)
+  fixedTotalPrice         Decimal?               @db.Decimal(12, 2)
+  confidenceLevel         ConfidenceLevel        @default(MEDIUM)
+  contingencyPercent      Decimal                @default(15.00) @db.Decimal(5, 2) // 5%, 15%, 25% risk buffer
+  minTotalHours           Decimal                @db.Decimal(10, 2)
+  maxTotalHours           Decimal                @db.Decimal(10, 2)
+  p80EstimatedHours       Decimal?               @db.Decimal(10, 2) // 80th percentile risk model
+  minTotalCost            Decimal                @db.Decimal(12, 2)
+  maxTotalCost            Decimal                @db.Decimal(12, 2)
+  estimatedProfitMargin   Decimal?               @db.Decimal(5, 2) // projected margin %
+  assumptionsNotes        String?                @db.Text
+  isCurrent               Boolean                @default(true)
+
+  // Commercial Engine Extensions
+  scenarioType            EstimateScenarioType   @default(REALISTIC)
+  scenarioMultiplier      Decimal                @default(1.15) @db.Decimal(4, 2)
+  taxRatePercent          Decimal                @default(0.00) @db.Decimal(5, 2)
+  discountAmount          Decimal                @default(0.00) @db.Decimal(12, 2)
+  minimumProjectValue     Decimal?               @db.Decimal(12, 2)
+  breakdownSummary        Json?                  // cached { featureHours, taskHours, designHours, devHours, qaHours, deploymentHours, pmHours, bufferHours, subtotal, discount, tax, grandTotal }
+
+  // Approval Workflow
+  approvalStatus          EstimateApprovalStatus @default(DRAFT)
+  requiresManagerApproval Boolean                @default(false)
+  approvedById            String?
+  approvedAt              DateTime?
+  rejectionReason         String?                @db.Text
+  clientApprovedAt        DateTime?
+  revisionNotes           String?                @db.Text
+
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @updatedAt
+
+  project                 Project                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  rateCard                RateCard?              @relation(fields: [rateCardId], references: [id], onDelete: SetNull)
+  approvedBy              User?                  @relation("EstimateApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  items                   EstimateItem[]
+  proposals               Proposal[]
+  invoices                Invoice[]
+  accuracyRecords         EstimateAccuracyRecord[]
+
+  @@index([projectId])
+  @@index([rateCardId])
+  @@index([approvedById])
+  @@index([approvalStatus])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([projectId, approvalStatus])
+  @@map("estimates")
+}
+
+// ---------------------------------------------------------
+// 19. ESTIMATE ITEMS
+// ---------------------------------------------------------
+model EstimateItem {
+  id              String           @id @default(uuid())
+  estimateId      String
+  featureId       String?
+  category        EstimateCategory @default(DEVELOPMENT)
+  roleTitle       String?          // 'Lead Architect', 'Senior Dev', 'UI/UX Designer', 'QA Lead', 'PM', 'DevOps'
+  hourlyRate      Decimal?         @db.Decimal(10, 2)
+  title           String
+  description     String?
+  complexity      ComplexityLevel  @default(MEDIUM)
+  minHours        Decimal          @db.Decimal(8, 2)
+  maxHours        Decimal          @db.Decimal(8, 2)
+  calculatedCost  Decimal          @db.Decimal(10, 2)
+  manualOverride  Boolean          @default(false)
+  overrideReason  String?
+  taskStoryId     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  estimate        Estimate         @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  feature         Feature?         @relation(fields: [featureId], references: [id], onDelete: SetNull)
+
+  @@index([estimateId])
+  @@index([featureId])
+  @@index([category])
+  @@map("estimate_items")
+}
+
+// ---------------------------------------------------------
+// 20. PROPOSALS (With White-Labeling & Digital Seal)
+// ---------------------------------------------------------
+model Proposal {
+  id                  String                  @id @default(uuid())
+  projectId           String
+  estimateId          String?
+  version             Int                     @default(1)
+  title               String
+  status              ProposalStatus          @default(DRAFT)
+  executiveSummary    String                  @db.Text
+  objectives          String                  @db.Text
+  scopeSummary        String                  @db.Text
+  deliverables        Json                    // array of structured deliverable objects
+  milestones          Json                    // structured milestones timeline
+  assumptions         String                  @db.Text
+  exclusions          String                  @db.Text
+  paymentTerms        String                  @db.Text
+  timelineSummary     String                  @db.Text
+  totalPrice          Decimal                 @db.Decimal(12, 2)
+  currency            String                  @default("USD")
+  shareToken          String                  @unique @default(uuid())
+  shareUrlExpires     DateTime?
+  branding            Json?                   // { logoUrl, agencyName, primaryColor, accentColor, websiteUrl }
+  coverPage           Json?                   // { subtitle, preparedForCompany, preparedByContact, validUntil }
+  sectionApprovals    Json?                   // { [sectionKey]: { approved: boolean, approvedAt, clientName } }
+  sentAt              DateTime?
+  viewedAt            DateTime?
+  approvedAt          DateTime?
+  rejectedAt          DateTime?
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
+
+  project             Project                 @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  estimate            Estimate?               @relation(fields: [estimateId], references: [id], onDelete: SetNull)
+  approvals           Approval[]
+  comments            ClientComment[]
+  approvalCertificate ApprovalCertificate?
+  delegations         StakeholderDelegation[]
+  clientUpdates       ClientProgressUpdate[]
+
+  @@index([projectId])
+  @@index([shareToken])
+  @@index([status])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([projectId, status])
+  @@map("proposals")
+}
+
+// ---------------------------------------------------------
+// 21. APPROVALS & CLIENT COMMENTS
+// ---------------------------------------------------------
+model Approval {
+  id                      String             @id @default(uuid())
+  proposalId              String
+  userId                  String?            // null if external client reviewing via token
+  clientName              String
+  clientEmail             String
+  signerTitle             String?
+  signerCompany           String?
+  action                  ApprovalAction
+  approvalType            ClientApprovalType @default(FULL_SCOPE)
+  sectionApprovalsSummary Json?              // summary breakdown if sectional approval
+  delegationId            String?
+  comments                String?            @db.Text
+  ipAddress               String?
+  userAgent               String?
+  createdAt               DateTime           @default(now())
+
+  proposal                Proposal           @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  user                    User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([proposalId])
+  @@map("approvals")
+}
+
+model ClientComment {
+  id              String          @id @default(uuid())
+  proposalId      String
+  userId          String?         // null if external client
+  parentId        String?         // threaded discussion parent
+  authorName      String
+  authorEmail     String
+  sectionKey      String          // e.g. 'deliverables.0', 'paymentTerms', 'timeline.milestone_2'
+  targetItemTitle String?         // descriptive context of the item being commented on
+  content         String          @db.Text
+  attachments     Json?           // array of { name, url, sizeBytes, mimeType }
+  isResolved      Boolean         @default(false)
+  resolvedById    String?
+  resolvedAt      DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  proposal        Proposal        @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  user            User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  parent          ClientComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies         ClientComment[] @relation("CommentReplies")
+
+  @@index([proposalId])
+  @@index([sectionKey])
+  @@index([parentId])
+  @@map("client_comments")
+}
+
+model ApprovalCertificate {
+  id                      String   @id @default(uuid())
+  proposalId              String   @unique
+  certificateHash         String   // SHA-256 hash of approved scope + estimate + client IP + timestamp
+  clientName              String
+  clientEmail             String
+  signerTitle             String?
+  signerCompany           String?
+  clientIp                String
+  clientUserAgent         String
+  approvedAmount          Decimal  @db.Decimal(12, 2)
+  currency                String
+  documentVersion         Int      @default(1)
+  consentStatement        String   @default("I confirm I am authorized to approve this project specification and commercial investment on behalf of the client organization.")
+  legalDisclaimer         String   @default("Cryptographic proof of digital approval intent and version integrity. Does not constitute statutory legal e-signature advice.")
+  sectionApprovalsSummary Json?
+  approvedAt              DateTime @default(now())
+
+  proposal                Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@map("approval_certificates")
+}
+
+// ---------------------------------------------------------
+// 21B. STAKEHOLDER DELEGATIONS & PROGRESS UPDATES
+// ---------------------------------------------------------
+model StakeholderDelegation {
+  id               String           @id @default(uuid())
+  proposalId       String
+  delegatedByName  String
+  delegatedByEmail String
+  recipientName    String
+  recipientEmail   String
+  recipientRole    String           // 'Financial Approver', 'Technical Stakeholder', 'Legal Signatory'
+  notes            String?          @db.Text
+  accessToken      String           @unique @default(uuid())
+  status           DelegationStatus @default(ACTIVE)
+  expiresAt        DateTime?
+  acceptedAt       DateTime?
+  createdAt        DateTime         @default(now())
+
+  proposal         Proposal         @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@index([proposalId])
+  @@index([accessToken])
+  @@map("stakeholder_delegations")
+}
+
+model ClientProgressUpdate {
+  id                   String           @id @default(uuid())
+  projectId            String
+  proposalId           String?
+  updateType           ClientUpdateType @default(WEEKLY_DIGEST)
+  title                String
+  summaryMarkdown      String           @db.Text
+  milestonesCompleted  Json             // array of { title, completedDate, notes }
+  upcomingDeliverables Json             // array of { title, targetDate, owner }
+  blockersNotes        String?          @db.Text
+  scheduleHealth       String           @default("ON_TRACK") // 'ON_TRACK', 'NEEDS_ATTENTION', 'AT_RISK'
+  sentAt               DateTime?
+  viewedAt             DateTime?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  project              Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  proposal             Proposal?        @relation(fields: [proposalId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([proposalId])
+  @@map("client_progress_updates")
+}
+
+// ---------------------------------------------------------
+// 22. TASKS
+// ---------------------------------------------------------
+model Task {
+  id             String          @id @default(uuid())
+  projectId      String
+  milestoneId    String?
+  userStoryId    String?
+  assignedToId   String?
+  title          String
+  description    String?         @db.Text
+  status         TaskStatus      @default(TODO)
+  priority       PriorityLevel   @default(MEDIUM)
+  estimatedHours Decimal?        @db.Decimal(6, 2)
+  dueDate        DateTime?
+  externalId     String?         // Jira Key, Linear ID, Trello Card ID, GitHub Issue #
+  externalUrl    String?
+  displayOrder   Int             @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  project        Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  milestone      Milestone?      @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  userStory      UserStory?      @relation(fields: [userStoryId], references: [id], onDelete: SetNull)
+  assignedTo     User?           @relation("AssignedToUser", fields: [assignedToId], references: [id], onDelete: SetNull)
+  syncRecords    TaskExportSyncRecord[]
+
+  @@index([projectId])
+  @@index([milestoneId])
+  @@index([assignedToId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([projectId, status])
+  @@index([projectId, dueDate])
+  @@map("tasks")
+}
+
+// ---------------------------------------------------------
+// 23. MILESTONES
+// ---------------------------------------------------------
+model Milestone {
+  id          String    @id @default(uuid())
+  projectId   String
+  title       String
+  description String?   @db.Text
+  targetDate  DateTime?
+  completedAt DateTime?
+  orderIndex  Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks       Task[]
+
+  @@index([projectId])
+  @@index([targetDate])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@map("milestones")
+}
+
+// ---------------------------------------------------------
+// 24. CHANGE REQUESTS
+// ---------------------------------------------------------
+model ChangeRequest {
+  id                  String              @id @default(uuid())
+  projectId           String
+  requestNumber       Int                 @default(1)
+  title               String
+  description         String              @db.Text
+  scopeImpact         String              @db.Text
+  timelineImpactDays  Int                 @default(0)
+  costImpact          Decimal             @default(0.00) @db.Decimal(10, 2)
+  status              ChangeRequestStatus @default(DRAFT)
+  clientFeedback      String?             @db.Text
+  approvedAt          DateTime?
+  rejectedAt          DateTime?
+  tasksUpdated        Boolean             @default(false)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  project             Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([projectId, status])
+  @@map("change_requests")
+}
+
+// ---------------------------------------------------------
+// 25. INTEGRATIONS & FIELD MAPPINGS
+// ---------------------------------------------------------
+model Integration {
+  id             String              @id @default(uuid())
+  organizationId String
+  provider       IntegrationProvider
+  encryptedToken String              @db.Text // AES-256 encrypted
+  refreshToken   String?             @db.Text
+  tokenExpiresAt DateTime?
+  externalOrgId  String?
+  targetProject  String?             // e.g. Jira Project Key or Linear Team ID
+  webhookUrl     String?             // Slack Incoming Webhook URL or Notion DB URI
+  healthStatus   String              @default("HEALTHY") // 'HEALTHY', 'DEGRADED', 'ERROR'
+  status         IntegrationStatus   @default(CONNECTED)
+  fieldMappings  Json?               // mapping of priority, issue types, labels
+  lastSyncAt     DateTime?
+  lastTestedAt   DateTime?
+  lastError      String?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  organization   Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, provider])
+  @@index([organizationId])
+  @@map("integrations")
+}
+
+// ---------------------------------------------------------
+// 25B. TASK SYNC RECORDS & WEBHOOK SUBSCRIPTIONS
+// ---------------------------------------------------------
+model TaskExportSyncRecord {
+  id              String              @id @default(uuid())
+  taskId          String
+  projectId       String
+  provider        IntegrationProvider
+  externalId      String              // e.g. Jira Issue Key, Linear ID, Trello Card ID, GitHub Issue #
+  externalUrl     String?
+  syncStatus      SyncStatus          @default(PENDING)
+  retryCount      Int                 @default(0)
+  lastSyncAt      DateTime            @default(now())
+  lastError       String?             @db.Text
+  idempotencyKey  String              @unique
+  payloadSnapshot Json?
+
+  task            Task                @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  project         Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([projectId])
+  @@index([provider])
+  @@index([syncStatus])
+  @@map("task_export_sync_records")
+}
+
+model WebhookSubscription {
+  id             String               @id @default(uuid())
+  organizationId String
+  targetUrl      String
+  secret         String               // HMAC SHA-256 signing secret
+  eventTypes     WebhookEventType[]
+  isActive       Boolean              @default(true)
+  description    String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deliveryLogs   WebhookDeliveryLog[]
+
+  @@index([organizationId])
+  @@map("webhook_subscriptions")
+}
+
+model WebhookDeliveryLog {
+  id             String              @id @default(uuid())
+  subscriptionId String
+  eventType      WebhookEventType
+  payload        Json
+  responseStatus Int?
+  durationMs     Int?
+  errorMessage   String?             @db.Text
+  attemptNumber  Int                 @default(1)
+  deliveredAt    DateTime            @default(now())
+
+  subscription   WebhookSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+  @@index([eventType])
+  @@map("webhook_delivery_logs")
+}
+
+// ---------------------------------------------------------
+// 26. RATE CARDS (Agency Estimation Standard)
+// ---------------------------------------------------------
+model RateCard {
+  id                        String         @id @default(uuid())
+  organizationId            String
+  name                      String         // 'Standard Agency Rates', 'Startup Discount Rates'
+  currency                  String         @default("USD")
+  isDefault                 Boolean        @default(false)
+  taxRatePercent            Decimal        @default(0.00) @db.Decimal(5, 2)
+  taxIsInclusive            Boolean        @default(false)
+  taxRegistrationNumber     String?
+  discountRules             Json?          // Array of discount policies: volume, early-bird, partner, non-profit
+  minimumProjectValue       Decimal?       @default(0.00) @db.Decimal(12, 2)
+  managerApprovalThreshold  Decimal?       @default(10000.00) @db.Decimal(12, 2)
+  createdAt                 DateTime       @default(now())
+  updatedAt                 DateTime       @updatedAt
+
+  organization              Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  items                     RateCardItem[]
+  estimates                 Estimate[]
+
+  @@index([organizationId])
+  @@map("rate_cards")
+}
+
+model RateCardItem {
+  id         String   @id @default(uuid())
+  rateCardId String
+  roleTitle  String   // 'Senior Architect', 'Full Stack Dev', 'UI/UX Designer', 'QA'
+  hourlyRate Decimal  @db.Decimal(10, 2)
+
+  rateCard   RateCard @relation(fields: [rateCardId], references: [id], onDelete: Cascade)
+
+  @@index([rateCardId])
+  @@map("rate_card_items")
+}
+
+// ---------------------------------------------------------
+// 27. INVOICES (Ledger Linkage - Financial Tracking Only)
+// ---------------------------------------------------------
+model Invoice {
+  id                String         @id @default(uuid())
+  projectId         String
+  estimateId        String?
+  invoiceNumber     String         @unique // e.g. "INV-2026-0042"
+  title             String
+  status            InvoiceStatus  @default(DRAFT)
+  currency          String         @default("USD")
+  totalAmount       Decimal        @db.Decimal(12, 2)
+  invoicedAmount    Decimal        @db.Decimal(12, 2)
+  paidAmount        Decimal        @default(0.00) @db.Decimal(12, 2)
+  outstandingAmount Decimal        @db.Decimal(12, 2)
+  issueDate         DateTime       @default(now())
+  dueDate           DateTime?
+  notes             String?        @db.Text
+  lineItems         Json           // array of { description, category, hours, rate, amount }
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  project           Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  estimate          Estimate?      @relation(fields: [estimateId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([estimateId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([projectId, status])
+  @@map("invoices")
+}
+
+// ---------------------------------------------------------
+// 28. ESTIMATE ACCURACY & VARIANCE TRACKER
+// ---------------------------------------------------------
+model EstimateAccuracyRecord {
+  id                      String   @id @default(uuid())
+  estimateId              String
+  projectId               String
+  estimatedTotalHours     Decimal  @db.Decimal(10, 2)
+  actualTotalHours        Decimal  @db.Decimal(10, 2)
+  varianceHours           Decimal  @db.Decimal(10, 2) // actual - estimated
+  variancePercent         Decimal  @db.Decimal(6, 2)  // ((actual - estimated) / estimated) * 100
+  roleVarianceJson        Json     // breakdown of variance by role/category
+  recurringErrorsJson     Json     // detected systemic error tags & explanations
+  calibrationMultiplier   Decimal  @default(1.00) @db.Decimal(4, 2) // learned multiplier for future estimates
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  estimate                Estimate @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  project                 Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([estimateId])
+  @@index([projectId])
+  @@map("estimate_accuracy_records")
+}
+
+// ---------------------------------------------------------
+// 27. TEMPLATES (Private & Community)
+// ---------------------------------------------------------
+model Template {
+  id             String        @id @default(uuid())
+  organizationId String?       // null = official system template
+  title          String
+  category       String        // 'SaaS', 'Mobile', 'MVP', 'E-Commerce'
+  description    String        @db.Text
+  isPublic       Boolean       @default(false)
+  structure      Json          // features, user stories, acceptance criteria boilerplate
+  usageCount     Int           @default(0)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([category])
+  @@map("templates")
+}
+
+// ---------------------------------------------------------
+// 28. AI USAGE (Cost & Quota Metering)
+// ---------------------------------------------------------
+model AiUsage {
+  id             String       @id @default(uuid())
+  organizationId String
+  operationType  String       // 'TRANSCRIPTION', 'REQUIREMENT_EXTRACTION', 'ESTIMATION_GENERATION'
+  modelName      String       // 'whisper-1', 'gemini-1.5-flash', etc.
+  promptTokens   Int          @default(0)
+  responseTokens Int          @default(0)
+  creditsBilled  Int          @default(1)
+  durationMs     Int?
+  costUsd        Decimal?     @db.Decimal(6, 4)
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("ai_usage")
+}
+
+model CreditTopUp {
+  id             String       @id @default(uuid())
+  organizationId String
+  creditsAmount  Int
+  amountPaid     Decimal      @db.Decimal(10, 2)
+  currency       String       @default("PKR")
+  paymentMethod  String       // 'stripe', 'jazzcash', 'easypaisa'
+  transactionId  String       @unique
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("credit_top_ups")
+}
+
+// ---------------------------------------------------------
+// 29. NOTIFICATIONS
+// ---------------------------------------------------------
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      String   // 'PROPOSAL_VIEWED', 'PROPOSAL_APPROVED', 'CHANGE_REQUEST_SENT', etc.
+  linkUrl   String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+// ---------------------------------------------------------
+// 30. AUDIT LOGS
+// ---------------------------------------------------------
+model AuditLog {
+  id             String       @id @default(uuid())
+  organizationId String
+  userId         String?
+  action         AuditAction
+  entityName     String       // e.g. 'Project', 'Proposal', 'Scope'
+  entityId       String
+  metadata       Json?        // old and new state, IP address, user-agent
+  ipAddress      String?
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([organizationId, createdAt])
+  @@index([entityName, entityId])
+  @@map("audit_logs")
+}
+
+// ---------------------------------------------------------
+// 30B. ANALYTICS & SCHEDULED REPORTS
+// ---------------------------------------------------------
+model ScheduledReportConfig {
+  id             String       @id @default(uuid())
+  organizationId String
+  reportType     String       // 'WEEKLY_EXECUTIVE', 'MONTHLY_FINANCIAL', 'PROJECT_HEALTH', 'CLIENT_DIGEST'
+  recipients     String[]     // target email addresses
+  format         String       @default("PDF") // 'PDF', 'CSV'
+  frequency      String       @default("WEEKLY") // 'WEEKLY', 'MONTHLY'
+  dayOfWeek      Int?         @default(1) // 1 = Monday
+  dayOfMonth     Int?         @default(1)
+  isActive       Boolean      @default(true)
+  lastSentAt     DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("scheduled_report_configs")
+}
+
+model AnalyticsSnapshot {
+  id             String        @id @default(uuid())
+  organizationId String?       // null = platform-wide anonymized founder view
+  periodType     String        // 'DAILY', 'WEEKLY', 'MONTHLY'
+  periodStart    DateTime
+  metricsJson    Json          // precomputed aggregations: funnel, retention, utilization
+  createdAt      DateTime      @default(now())
+
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([periodStart])
+  @@map("analytics_snapshots")
+}
+
+// ---------------------------------------------------------
+// 31. ATTACHMENTS
+// ---------------------------------------------------------
+model Attachment {
+  id            String   @id @default(uuid())
+  projectId     String
+  fileName      String
+  fileUrl       String
+  fileSizeBytes Int
+  mimeType      String
+  createdAt     DateTime @default(now())
+
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("attachments")
+}
+
+// ---------------------------------------------------------
+// 32. ONBOARDING & ACTIVATION PROFILE
+// ---------------------------------------------------------
+model OnboardingProfile {
+  id                 String       @id @default(uuid())
+  userId             String       @unique
+  userType           UserType     @default(FREELANCER)
+  primaryService     String       // Web, Mobile, SaaS, Consulting, etc.
+  typicalProjectType String       // MVP, Redesign, E-Commerce, etc.
+  preferredLanguage  String       @default("en")
+  teamSize           String       @default("1")
+  primaryGoal        PrimaryGoal  @default(FASTER_PROPOSALS)
+  isCompleted        Boolean      @default(false)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  user               User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("onboarding_profiles")
+}
+
+// ---------------------------------------------------------
+// 33. ACTIVATION PROGRESS CHECKLIST (10 Key Steps)
+// ---------------------------------------------------------
+model ActivationChecklist {
+  id                   String       @id @default(uuid())
+  userId               String       @unique
+  organizationId       String
+  createWorkspace      Boolean      @default(true)
+  addFirstClient       Boolean      @default(false)
+  createFirstProject   Boolean      @default(false)
+  uploadBrief          Boolean      @default(false)
+  generateRequirements Boolean      @default(false)
+  reviewAiOutput       Boolean      @default(false)
+  createEstimate       Boolean      @default(false)
+  sendProposal         Boolean      @default(false)
+  obtainApproval       Boolean      @default(false)
+  generateTasks        Boolean      @default(false)
+  isActivated          Boolean      @default(false) // 1 project + 1 scope + 1 estimate + 1 proposal sent
+  activatedAt          DateTime?
+  completedStepsCount  Int          @default(1)
+  totalStepsCount      Int          @default(10)
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  user                 User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("activation_checklists")
+}
+
+// ---------------------------------------------------------
+// 34. PROJECT RESUME STATE & RECENT ACTIVITY
+// ---------------------------------------------------------
+model ProjectResumeState {
+  id                String       @id @default(uuid())
+  userId            String
+  projectId         String
+  lastSection       String       // 'BRIEF_UPLOAD', 'AI_EXTRACTION', 'SCOPE_BUILDER', 'ESTIMATE_BUILDER', 'PROPOSAL_PREVIEW', 'TASK_BOARD'
+  lastAction        String       // Description of last modification
+  resumeUrl         String       // Deep link directly to exact tab/modal
+  completionPercent Int          @default(0)
+  lastAccessedAt    DateTime     @default(now())
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project           Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
+  @@index([userId, lastAccessedAt])
+  @@map("project_resume_states")
+}
+
+// ---------------------------------------------------------
+// 35. SCOPE VERSIONS & AUDITABLE SNAPSHOTS
+// ---------------------------------------------------------
+model ScopeVersion {
+  id              String   @id @default(uuid())
+  projectId       String
+  versionNumber   Int
+  versionType     String   // 'AI_GENERATION', 'USER_EDIT', 'CLARIFICATION_RE_EXTRACTION', 'RESTORE_ROLLBACK'
+  snapshotData    Json     // full JSON snapshot of requirements, features, user stories, ACs, assumptions, exclusions
+  changeSummary   String   @db.Text
+  createdById     String?
+  createdAt       DateTime @default(now())
+
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy       User?    @relation("VersionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([projectId, versionNumber])
+  @@map("scope_versions")
+}
+
+// ---------------------------------------------------------
+// 36. REQUIREMENT CONFLICTS & ANOMALY DETECTION
+// ---------------------------------------------------------
+model RequirementConflict {
+  id              String       @id @default(uuid())
+  projectId       String
+  conflictType    ConflictType
+  severity        PriorityLevel @default(MEDIUM)
+  title           String
+  description     String       @db.Text
+  affectedItemIds Json         // array of string IDs [req_1, req_2]
+  resolutionStatus String      @default("OPEN") // 'OPEN', 'RESOLVED', 'IGNORED'
+  resolutionNotes String?      @db.Text
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  project         Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, resolutionStatus])
+  @@map("requirement_conflicts")
+}
+
+// ---------------------------------------------------------
+// 37. CLARIFICATION REQUESTS & CLIENT ANSWERS
+// ---------------------------------------------------------
+model ClarificationRequest {
+  id               String              @id @default(uuid())
+  projectId        String
+  question         String              @db.Text
+  suggestedContext String              @db.Text
+  clientResponse   String?             @db.Text
+  status           ClarificationStatus @default(DRAFT)
+  sentAt           DateTime?
+  answeredAt       DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  project          Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, status])
+  @@map("clarification_requests")
+}
+
+// ---------------------------------------------------------
+// 38. AI FEEDBACK LOOP (Helpful / Partially / Not Helpful)
+// ---------------------------------------------------------
+model AiFeedback {
+  id             String           @id @default(uuid())
+  projectId      String
+  userId         String
+  requirementId  String?
+  rating         AiFeedbackRating
+  feedbackNotes  String?          @db.Text
+  promptTokens   Int              @default(0)
+  responseTokens Int              @default(0)
+  modelName      String
+  qualityMode    String           @default("BALANCED")
+  createdAt      DateTime         @default(now())
+
+  project        Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([rating])
+  @@map("ai_feedbacks")
+}
+
+// ---------------------------------------------------------
+// 39. PROJECT COMMENTS & THREADED DISCUSSIONS
+// ---------------------------------------------------------
+model ProjectComment {
+  id           String              @id @default(uuid())
+  projectId    String
+  authorId     String?
+  authorName   String
+  authorEmail  String
+  authorRole   OrgRole             @default(VIEWER)
+  entityType   String              // 'SCOPE_ITEM', 'ESTIMATE', 'PROPOSAL', 'TASK', 'GENERAL'
+  entityId     String?             // e.g. requirement ID, feature ID, task ID
+  parentId     String?
+  content      String              @db.Text
+  mentions     Json?               // array of user IDs mentioned: ["usr_1", "usr_2"]
+  isResolved   Boolean             @default(false)
+  resolvedById String?
+  resolvedAt   DateTime?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  project      Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author       User?               @relation("CommentAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  resolvedBy   User?               @relation("CommentResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+  parent       ProjectComment?     @relation("ThreadedReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies      ProjectComment[]    @relation("ThreadedReplies")
+  attachments  CommentAttachment[]
+
+  @@index([projectId, entityType, entityId])
+  @@index([parentId])
+  @@map("project_comments")
+}
+
+// ---------------------------------------------------------
+// 40. COMMENT ATTACHMENTS
+// ---------------------------------------------------------
+model CommentAttachment {
+  id            String         @id @default(uuid())
+  commentId     String
+  fileName      String
+  fileUrl       String
+  fileSizeBytes Int
+  mimeType      String
+  createdAt     DateTime       @default(now())
+
+  comment       ProjectComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@index([commentId])
+  @@map("comment_attachments")
+}
+
+// ---------------------------------------------------------
+// 41. PRESENCE SESSIONS & CONCURRENT EDIT LOCKS
+// ---------------------------------------------------------
+model PresenceSession {
+  id              String    @id @default(uuid())
+  projectId       String
+  userId          String
+  userEmail       String
+  userName        String
+  avatarUrl       String?
+  activeSection   String    // 'SCOPE_BUILDER', 'ESTIMATE_BUILDER', 'TASKS', 'OVERVIEW'
+  lockedItemId    String?   // item ID currently being edited
+  lockAcquiredAt  DateTime?
+  lastHeartbeatAt DateTime  @default(now())
+  clientIp        String?
+  createdAt       DateTime  @default(now())
+
+  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([projectId, lockedItemId])
+  @@map("presence_sessions")
+}
+
+// ---------------------------------------------------------
+// 42. ACTIVITY FEED (Team, Project, and Client Auditing)
+// ---------------------------------------------------------
+model ActivityFeedItem {
+  id             String       @id @default(uuid())
+  organizationId String
+  projectId      String?
+  actorId        String?
+  actorName      String
+  actorType      String       // 'TEAM_MEMBER', 'CLIENT', 'SYSTEM_AI'
+  activityType   String       // 'PROJECT_CREATED', 'SCOPE_EDITED', 'ESTIMATE_UPDATED', 'PROPOSAL_SENT', etc.
+  title          String
+  description    String       @db.Text
+  entityType     String?
+  entityId       String?
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  project        Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  actor          User?        @relation("ActorUser", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
+  @@index([projectId, createdAt])
+  @@index([actorType])
+  @@index([activityType])
+  @@map("activity_feed_items")
+}
+
+// ---------------------------------------------------------
+// 43. NOTIFICATION PREFERENCES
+// ---------------------------------------------------------
+model NotificationPreference {
+  id                    String   @id @default(uuid())
+  userId                String   @unique
+  inAppMentions         Boolean  @default(true)
+  inAppProposalApproved Boolean  @default(true)
+  inAppScopeChanged     Boolean  @default(true)
+  inAppTaskAssigned     Boolean  @default(true)
+  emailMentions         Boolean  @default(true)
+  emailProposalApproved Boolean  @default(true)
+  emailScopeChanged     Boolean  @default(false)
+  emailTaskAssigned     Boolean  @default(true)
+  emailWeeklyDigest     Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
+// ---------------------------------------------------------
+// 44. GUIDED DISCOVERY QUESTIONNAIRE (12 Categories)
+// ---------------------------------------------------------
+model DiscoveryQuestionnaire {
+  id                      String   @id @default(uuid())
+  projectId               String   @unique
+  businessGoal            String   @db.Text
+  targetUsers             String   @db.Text
+  coreProblem             String   @db.Text
+  mustHaveFeatures        Json     // array of must-have features
+  niceToHaveFeatures      Json     // array of nice-to-have features
+  technicalConstraints    String   @db.Text
+  designConstraints       String   @db.Text
+  integrationRequirements String   @db.Text
+  complianceRequirements  String   @db.Text
+  launchDeadline          DateTime?
+  budgetRange             String
+  successMetrics          String   @db.Text
+  completenessScore       Int      @default(0) // 0 to 100
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  project                 Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("discovery_questionnaires")
+}
+
+// ---------------------------------------------------------
+// 45. USER PERSONAS
+// ---------------------------------------------------------
+model UserPersona {
+  id          String     @id @default(uuid())
+  projectId   String
+  name        String     // e.g. "Store Manager", "Shopper", "System Admin"
+  roleTitle   String
+  description String     @db.Text
+  goals       Json       // array of goals
+  painPoints  Json       // array of pain points
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  project     Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userFlows   UserFlow[]
+
+  @@index([projectId])
+  @@map("user_personas")
+}
+
+// ---------------------------------------------------------
+// 46. USER FLOWS & JOURNEYS
+// ---------------------------------------------------------
+model UserFlow {
+  id                   String       @id @default(uuid())
+  projectId            String
+  personaId            String?
+  title                String       // e.g. "Buyer Checkout & Payment Flow"
+  description          String       @db.Text
+  steps                Json         // array of { stepNumber: 1, action: 'View Cart', screen: 'CartView' }
+  keyScreens           Json         // array of screen names: ["Cart", "Checkout", "Receipt"]
+  edgeCases            Json         // array of strings: ["Network Drop", "Card Expired"]
+  linkedRequirementIds Json         // array of requirement IDs
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  project              Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  persona              UserPersona? @relation(fields: [personaId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([personaId])
+  @@map("user_flows")
+}
+
+// ---------------------------------------------------------
+// 47. PRODUCTION-GRADE RELIABILITY & SECURITY MODELS
+// ---------------------------------------------------------
+
+model UserSession {
+  id                 String       @id @default(uuid())
+  userId             String
+  organizationId     String
+  sessionToken       String       @unique
+  deviceFingerprint  String?
+  userAgent          String?
+  ipAddress          String?
+  lastActiveAt       DateTime     @default(now())
+  expiresAt          DateTime
+  isRevoked          Boolean      @default(false)
+  revokedReason      String?
+  createdAt          DateTime     @default(now())
+
+  user               User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([sessionToken])
+  @@index([expiresAt])
+  @@map("user_sessions")
+}
+
+model UserDevice {
+  id             String       @id @default(uuid())
+  userId         String
+  deviceId       String       // Deterministic hash of device signature
+  deviceName     String       // e.g. "MacBook Pro / Chrome 124"
+  deviceType     String       @default("DESKTOP") // DESKTOP, MOBILE, TABLET
+  lastIpAddress  String
+  isTrusted      Boolean      @default(false)
+  lastSeenAt     DateTime     @default(now())
+  createdAt      DateTime     @default(now())
+
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, deviceId])
+  @@index([userId])
+  @@map("user_devices")
+}
+
+model BackgroundJob {
+  id             String       @id @default(uuid())
+  organizationId String
+  jobType        String       // AI_EXTRACTION, WEBHOOK_DELIVERY, SCHEDULED_REPORT, DATA_EXPORT, BACKUP_SNAPSHOT
+  payload        Json
+  status         String       @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED, DEAD_LETTER
+  priority       Int          @default(0) // Higher executes first
+  attempts       Int          @default(0)
+  maxAttempts    Int          @default(3)
+  nextRunAt      DateTime     @default(now())
+  lockedAt       DateTime?
+  lockedBy       String?      // Worker node ID
+  leaseExpiresAt DateTime?
+  heartbeatAt    DateTime?
+  errorMessage   String?      @db.Text
+  errorStack     String?      @db.Text
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([status, nextRunAt])
+  @@index([priority, createdAt])
+  @@map("background_jobs")
+}
+
+model AudioTranscriptionJob {
+  id              String       @id @default(uuid())
+  organizationId  String
+  userId          String
+  fileName        String
+  mimeType        String
+  fileSizeBytes   Int
+  durationSeconds Int?
+  status          String       @default("QUEUED") // QUEUED, PROCESSING, COMPLETED, FAILED
+  progressPercent Int          @default(0)
+  transcriptText  String?      @db.Text
+  segments        Json?
+  errorMessage    String?      @db.Text
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status])
+  @@map("audio_transcription_jobs")
+}
+
+model IdempotencyRecord {
+  id             String       @id @default(uuid())
+  organizationId String
+  idempotencyKey String       @unique
+  requestPath    String
+  requestHash    String       // SHA-256 of canonical request payload
+  responseCode   Int?
+  responseBody   Json?
+  status         String       @default("PROCESSING") // PROCESSING, COMPLETED
+  expiresAt      DateTime
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([idempotencyKey])
+  @@index([expiresAt])
+  @@map("idempotency_records")
+}
+
+model DatabaseBackupSnapshot {
+  id             String       @id @default(uuid())
+  snapshotId     String       @unique
+  organizationId String?      // Optional: tenant-scoped export vs cluster backup
+  backupType     String       @default("FULL_SNAPSHOT") // FULL_SNAPSHOT, TENANT_EXPORT
+  sizeBytes      BigInt       @default(0)
+  checksumSha256 String
+  storageLocation String
+  status         String       @default("COMPLETED") // COMPLETED, VERIFIED, FAILED
+  retentionDays  Int          @default(30)
+  expiresAt      DateTime
+  createdAt      DateTime     @default(now())
+
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([snapshotId])
+  @@index([expiresAt])
+  @@map("database_backup_snapshots")
+}
+
+// ---------------------------------------------------------
+// 48. ENGAGEMENT & RETENTION SYSTEM MODELS
+// ---------------------------------------------------------
+
+model Referral {
+  id              String       @id @default(uuid())
+  referrerUserId  String
+  referredUserId  String?
+  referralCode    String
+  referredEmail   String?
+  status          String       @default("PENDING") // PENDING, REGISTERED, CONVERTED
+  rewardGranted   Boolean      @default(false)
+  rewardCredits   Int          @default(250)
+  createdAt       DateTime     @default(now())
+
+  referrerUser    User         @relation("ReferrerUser", fields: [referrerUserId], references: [id], onDelete: Cascade)
+
+  @@index([referrerUserId])
+  @@index([referralCode])
+  @@map("referrals")
+}
+
+model UserNudge {
+  id             String       @id @default(uuid())
+  userId         String
+  organizationId String
+  nudgeType      String       // SCOPE_PENDING, PROPOSAL_UNSENT, APPROVAL_FOLLOW_UP, INVOICE_PENDING, AI_REVIEW_WAITING
+  title          String
+  message        String       @db.Text
+  actionUrl      String
+  priority       Int          @default(1)
+  status         String       @default("ACTIVE") // ACTIVE, DISMISSED, SNOOZED, COMPLETED
+  snoozedUntil   DateTime?
+  createdAt      DateTime     @default(now())
+
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([organizationId])
+  @@map("user_nudges")
+}
+
+model FeedbackSubmission {
+  id             String       @id @default(uuid())
+  userId         String?
+  organizationId String?
+  type           String       // NPS, BUG, FEATURE_REQUEST, EXIT_SURVEY, GENERAL_FEEDBACK
+  score          Int?         // 0-10 for NPS
+  category       String?
+  title          String?
+  content        String       @db.Text
+  severity       String?      // LOW, MEDIUM, HIGH, CRITICAL (for bugs)
+  upvotes        Int          @default(0)
+  status         String       @default("SUBMITTED") // SUBMITTED, IN_REVIEW, PLANNED, RESOLVED
+  deviceContext  Json?
+  createdAt      DateTime     @default(now())
+
+  user           User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([type])
+  @@index([status])
+  @@index([upvotes])
+  @@map("feedback_submissions")
+}
+
+// ---------------------------------------------------------
+// 49. INTERNAL ADMIN, SUPPORT & OPERATIONAL TOOLS
+// ---------------------------------------------------------
+
+model SupportTicket {
+  id              String                 @id @default(uuid())
+  ticketNumber    String                 @unique // e.g. "SF-1042"
+  organizationId  String
+  creatorUserId   String
+  assignedUserId  String?
+  subject         String
+  description     String                 @db.Text
+  category        String                 // "BILLING", "AI_EXTRACTION", "INTEGRATIONS", "ESTIMATION", "BUG", "GENERAL"
+  priority        String                 @default("MEDIUM") // "LOW", "MEDIUM", "HIGH", "URGENT"
+  status          String                 @default("OPEN") // "OPEN", "IN_PROGRESS", "WAITING_ON_CUSTOMER", "RESOLVED", "CLOSED"
+  slaBreached     Boolean                @default(false)
+  resolvedAt      DateTime?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  organization    Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creatorUser     User                   @relation("TicketCreator", fields: [creatorUserId], references: [id], onDelete: Cascade)
+  assignedUser    User?                  @relation("TicketAssignee", fields: [assignedUserId], references: [id], onDelete: SetNull)
+  messages        SupportTicketMessage[]
+  history         SupportTicketHistory[]
+
+  @@index([organizationId])
+  @@index([creatorUserId])
+  @@index([assignedUserId])
+  @@index([status, priority])
+  @@map("support_tickets")
+}
+
+model SupportTicketMessage {
+  id              String        @id @default(uuid())
+  ticketId        String
+  authorUserId    String
+  isInternalNote  Boolean       @default(false) // true = staff only note, false = public customer reply
+  message         String        @db.Text
+  attachments     Json?
+  createdAt       DateTime      @default(now())
+
+  ticket          SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorUser      User          @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@index([authorUserId])
+  @@map("support_ticket_messages")
+}
+
+model SupportTicketHistory {
+  id              String        @id @default(uuid())
+  ticketId        String
+  actorUserId     String
+  changeType      String        // "STATUS_CHANGE", "ASSIGNMENT", "PRIORITY_CHANGE"
+  fromValue       String?
+  toValue         String?
+  createdAt       DateTime      @default(now())
+
+  ticket          SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@map("support_ticket_histories")
+}
+
+model FeatureFlag {
+  id                String       @id @default(uuid())
+  key               String       @unique // e.g. "ai_claude_35_sonnet", "notion_sync_v2"
+  name              String
+  description       String       @db.Text
+  isEnabled         Boolean      @default(false)
+  rolloutPercentage Int          @default(100) // 0-100
+  targetTiers       String[]     @default([]) // ["AGENCY", "ENTERPRISE"]
+  targetOrgIds      String[]     @default([]) // specific organization overrides
+  isABTest          Boolean      @default(false)
+  variants          Json?        // { "control": 50, "variantA": 50 }
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@index([key])
+  @@map("feature_flags")
+}
+
+model SystemAnnouncement {
+  id              String       @id @default(uuid())
+  title           String
+  content         String       @db.Text
+  type            String       @default("BANNER") // "BANNER", "MODAL", "EMAIL", "CHANGELOG"
+  targetPlan      String?      // null = ALL, "AGENCY", "PROFESSIONAL", etc.
+  targetRole      String?      // null = ALL, "OWNER", "ADMIN"
+  actionUrl       String?
+  actionLabel     String?
+  isActive        Boolean      @default(true)
+  startsAt        DateTime     @default(now())
+  expiresAt       DateTime?
+  createdAt       DateTime     @default(now())
+
+  @@index([isActive])
+  @@map("system_announcements")
+}
+
+model SystemOutageIncident {
+  id               String    @id @default(uuid())
+  serviceName      String    // e.g. "LLM_OPENAI", "JIRA", "POSTGRES"
+  severity         String    // "LOW", "MEDIUM", "HIGH", "CRITICAL"
+  state            String    // "DETECTED", "MITIGATING", "RESOLVED"
+  failureReason    String
+  degradedFallback Boolean   @default(false)
+  startedAt        DateTime  @default(now())
+  resolvedAt       DateTime?
+  durationSeconds  Int?
+  rootCauseNotes   String?   @db.Text
+
+  @@index([serviceName, state])
+  @@index([startedAt])
+  @@map("system_outage_incidents")
+}
+
+model SloMeasurement {
+  id                 String   @id @default(uuid())
+  journeyKey         String   // e.g. "REGISTER_AND_LOGIN", "GENERATE_AI_REQUIREMENTS"
+  sliType            String   // "AVAILABILITY", "LATENCY", "JOB_SUCCESS"
+  sloTargetPercent   Float
+  measuredPercent    Float
+  totalEvents        Int
+  goodEvents         Int
+  p95LatencyMs       Int?
+  windowStartDate    DateTime
+  windowEndDate      DateTime
+  createdAt          DateTime @default(now())
+
+  @@index([journeyKey, createdAt])
+  @@map("slo_measurements")
+}
+
+model ErrorBudgetBurnIncident {
+  id                    String    @id @default(uuid())
+  incidentId            String    @unique
+  title                 String
+  outageMinutes         Int
+  impactSeverityPercent Float
+  budgetConsumedPercent Float
+  requiresPostMortem    Boolean   @default(false)
+  postMortemCompleted   Boolean   @default(false)
+  postMortemDocUrl      String?
+  startedAt             DateTime  @default(now())
+  resolvedAt            DateTime?
+  createdAt             DateTime  @default(now())
+
+  @@index([incidentId])
+  @@map("error_budget_burn_incidents")
+}

@@ -48,3 +48,6 @@ test-results/
 tmp/
 temp/
 
+
+.vercel
+.env*

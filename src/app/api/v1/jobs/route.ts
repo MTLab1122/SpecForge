@@ -20,12 +20,12 @@ export async function GET(req: NextRequest) {
 
     const auth = AuthorizationService.authorize({
       context: { userId, organizationId: orgId, role },
-      action: "VIEW_QUEUE_METRICS"
+      action: "VIEW_AUDIT_LOG"
     });
 
     if (!auth.allowed) {
       return NextResponse.json(
-        { success: false, error: auth.denialReason },
+        { success: false, error: auth.reason },
         { status: auth.statusCode }
       );
     }

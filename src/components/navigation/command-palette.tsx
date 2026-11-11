@@ -179,7 +179,7 @@ export function CommandPalette() {
         <div className="max-h-80 overflow-y-auto p-2 space-y-1">
           {filteredCommands.length === 0 ? (
             <div className="py-8 text-center text-sm text-slate-500">
-              No matching commands or projects found for "{query}".
+              No matching commands or projects found for &quot;{query}&quot;.
             </div>
           ) : (
             filteredCommands.map((item, idx) => {

@@ -259,8 +259,9 @@ export class LoadTester {
         amount: 25
       });
       await CreditLedger.commitReservation({
-        reservationId: reservation.reservationId,
-        finalAmountCharged: 25,
+        organizationId: "org_perf_test",
+        jobId,
+        actualAmount: 25,
         jobType: "AI_EXTRACTION"
       });
     });

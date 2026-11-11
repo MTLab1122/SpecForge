@@ -140,7 +140,7 @@ describe("Phase 3 Enhancement — Reliable AI & Document Pipeline Suite", () => 
 
       const res = await DurableJobQueue.markFailed({
         jobId: job.id,
-        error: new ValidationError("Uploaded document has corrupt header or invalid magic bytes"),
+        error: new ValidationError("file", "corrupt", "Uploaded document has corrupt header or invalid magic bytes"),
         isValidationError: true
       });
 
@@ -319,7 +319,7 @@ describe("Phase 3 Enhancement — Reliable AI & Document Pipeline Suite", () => 
       await DurableJobQueue.leaseNextJob("worker_1");
       await DurableJobQueue.markFailed({
         jobId: job2.id,
-        error: new ValidationError("Malformed input")
+        error: new ValidationError("input", "malformed", "Malformed input")
       });
 
       const afterRefund = CreditLedger.getWorkspaceCostSummary(orgId);

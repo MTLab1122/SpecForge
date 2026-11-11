@@ -229,7 +229,7 @@ export const DisasterRecoveryDashboard: React.FC<DisasterRecoveryDashboardProps>
                   {key.replace(/([A-Z])/g, " $1")}
                 </span>
                 <p className="text-slate-400 mt-2 text-[11px] leading-relaxed italic">
-                  "{template}"
+                  &quot;{template}&quot;
                 </p>
               </div>
               <button

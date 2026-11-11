@@ -30,9 +30,9 @@ export class ConflictDetector {
     const featureTitles = data.features.map((f) => ({ id: f.id, title: f.title.toLowerCase() }));
     for (let i = 0; i < featureTitles.length; i++) {
       for (let j = i + 1; j < featureTitles.length; j++) {
-        const wordsA = new Set(featureTitles[i].title.split(" "));
-        const wordsB = new Set(featureTitles[j].title.split(" "));
-        const intersection = [...wordsA].filter((w) => wordsB.has(w) && w.length > 3);
+        const wordsA = new Set<string>(featureTitles[i].title.split(" "));
+        const wordsB = new Set<string>(featureTitles[j].title.split(" "));
+        const intersection = [...wordsA].filter((w: string) => wordsB.has(w) && w.length > 3);
 
         if (intersection.length >= 2) {
           anomalies.push({

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { CreateUserPersonaSchema, CreateUserFlowSchema } from "@/lib/validations/structured-discovery";
 
-let mockPersonas = [
+let mockPersonas: Array<Record<string, unknown>> = [
   {
     id: "per_1",
     name: "Mobile Freelancer",
@@ -20,7 +20,7 @@ let mockPersonas = [
   }
 ];
 
-let mockFlows = [
+let mockFlows: Array<Record<string, unknown>> = [
   {
     id: "flow_1",
     personaName: "Mobile Freelancer",

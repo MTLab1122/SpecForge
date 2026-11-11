@@ -96,13 +96,13 @@ export interface WorkspacePluginInstallation {
 
 export class PluginSecurityViolationError extends AppError {
   constructor(message: string, context?: Record<string, any>) {
-    super(message, 403, "PLUGIN_SECURITY_VIOLATION", context);
+    super({ message, status: 403, code: "PLUGIN_SECURITY_VIOLATION" });
   }
 }
 
 export class PluginRateLimitExceededError extends AppError {
   constructor(message: string, context?: Record<string, any>) {
-    super(message, 429, "PLUGIN_RATE_LIMIT_EXCEEDED", context);
+    super({ message, status: 429, code: "PLUGIN_RATE_LIMIT_EXCEEDED" });
   }
 }
 
@@ -159,11 +159,11 @@ export class PluginRegistry {
   }): Promise<WorkspacePluginInstallation> {
     const manifest = this.manifests.get(options.pluginId);
     if (!manifest) {
-      throw new AppError(`Plugin '${options.pluginId}' not found in registry`, 404, "PLUGIN_NOT_FOUND");
+      throw new AppError({ message: `Plugin '${options.pluginId}' not found in registry`, status: 404, code: "PLUGIN_NOT_FOUND" });
     }
 
     if (!manifest.isActive) {
-      throw new AppError(`Plugin '${options.pluginId}' is currently inactive or deprecated`, 400, "PLUGIN_INACTIVE");
+      throw new AppError({ message: `Plugin '${options.pluginId}' is currently inactive or deprecated`, status: 400, code: "PLUGIN_INACTIVE" });
     }
 
     const key = `${options.workspaceId}:${options.pluginId}`;
@@ -185,8 +185,9 @@ export class PluginRegistry {
       organizationId: options.workspaceId,
       userId: options.userId,
       action: "PLUGIN_INSTALLED",
-      resourceId: options.pluginId,
-      details: {
+      entityName: "PLUGIN",
+      entityId: options.pluginId,
+      metadata: {
         pluginName: manifest.name,
         capabilities: manifest.capabilities,
         permissions: manifest.permissions

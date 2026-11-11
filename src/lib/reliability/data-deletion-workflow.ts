@@ -161,7 +161,7 @@ export class DataDeletionManager {
     organizationId: string;
     requestedByUserId: string;
   }): Promise<{ deletionId: string; anonymizedProfile: Record<string, any> }> {
-    const deletionId = `del_usr_${params.userId}_${Date.now()}`;
+    const deletionId = `del_${params.userId}_${Date.now()}`;
     const anonymizedProfile = DataProtectionService.anonymizeUserForDeletion(params.userId);
 
     const auditPayload = JSON.stringify({ userId: params.userId, anonymizedProfile });

@@ -354,7 +354,7 @@ export function AiReviewWorkspace({
                 {/* Source Citation Callout */}
                 {item.sourceCitation && (
                   <div className="mt-2.5 p-2 rounded-lg bg-slate-50 border border-slate-150 text-[11px] text-slate-500 italic">
-                    "{item.sourceCitation}"
+                    &quot;{item.sourceCitation}&quot;
                   </div>
                 )}
 

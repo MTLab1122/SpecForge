@@ -154,8 +154,8 @@ export class FeatureFlagsEngine {
           key,
           isEnabled: isExplicitlyAllowed,
           reason: isExplicitlyAllowed
-            ? "Explicit workspace override (enabled)"
-            : "Explicit workspace override (disabled)"
+            ? "Explicit organization override (enabled)"
+            : "Explicit organization override (disabled)"
         };
       }
       if (flag.targetOrgIds && flag.targetOrgIds.includes(context.organizationId)) {
@@ -165,7 +165,7 @@ export class FeatureFlagsEngine {
 
     // 3. Region Targeting Check
     if (flag.targetRegions && flag.targetRegions.length > 0) {
-      if (!context.region || !flag.targetRegions.includes(context.region)) {
+      if (context.region && !flag.targetRegions.includes(context.region)) {
         return {
           key,
           isEnabled: false,

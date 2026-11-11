@@ -520,6 +520,7 @@ export class StripeWebhookHandler {
     if (discrepancies.length > 0) {
       Logger.error(
         `Reconciliation mismatch detected for organization '${params.organizationId}'. Preserving customer data and alerting admin.`,
+        undefined,
         {
           organizationId: params.organizationId,
           context: { discrepancies }

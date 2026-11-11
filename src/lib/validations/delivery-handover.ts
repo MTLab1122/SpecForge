@@ -22,6 +22,7 @@ export const WebhookEventTypeEnum = z.enum([
   "change_request.created",
   "change_request.approved",
   "task.created",
+  "TASK_EXPORTED",
   "milestone.completed"
 ]);
 
@@ -38,6 +39,8 @@ export const InternalTaskStatusEnum = z.enum([
 
 export const InternalTaskSchema = z.object({
   id: z.string(),
+  projectId: z.string().optional(),
+  scopeDeliverableId: z.string().optional(),
   title: z.string().min(1, "Task title is required"),
   description: z.string().default(""),
   priority: InternalTaskPriorityEnum.default("MEDIUM"),
@@ -48,7 +51,11 @@ export const InternalTaskSchema = z.object({
   assigneeEmail: z.string().email().optional(),
   milestoneTitle: z.string().optional(),
   featureTitle: z.string().optional(),
-  acceptanceCriteria: z.array(z.string()).default([])
+  acceptanceCriteria: z.array(z.string()).default([]),
+  tags: z.array(z.string()).default([]),
+  version: z.number().int().positive().default(1),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional()
 });
 
 export const ConnectIntegrationSchema = z.object({

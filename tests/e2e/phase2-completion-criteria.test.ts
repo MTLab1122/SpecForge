@@ -254,8 +254,7 @@ describe("SpecForge Phase 2 - Comprehensive 23 Completion Criteria Verification"
 
     const result = await linearAdapter!.exportTask(
       { id: "task_export_99", title: "Setup Stripe Connect", description: "Automate payouts", priority: "CRITICAL", status: "TODO", estimatedHours: 16, labels: [] },
-      { apiKey: "lin_mock_key", defaultProjectOrTeamId: "team_alpha" },
-      "idemp_key_01"
+      { apiKey: "lin_mock_key", targetProjectOrList: "team_alpha" }
     );
 
     expect(result.syncStatus).toBe("SUCCESS");

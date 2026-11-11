@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
     if (!auth.allowed) {
       return NextResponse.json(
-        { success: false, error: auth.denialReason },
+        { success: false, error: auth.reason },
         { status: auth.statusCode }
       );
     }

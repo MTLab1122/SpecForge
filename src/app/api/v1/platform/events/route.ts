@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
     const auth = AuthorizationService.authorize({
       context: { userId, organizationId: workspaceId, role },
-      action: "VIEW_AUDIT_LOGS"
+      action: "VIEW_AUDIT_LOG"
     });
 
     if (!auth.allowed) {

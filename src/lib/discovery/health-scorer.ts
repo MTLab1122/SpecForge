@@ -93,7 +93,7 @@ export class ScopeHealthScorer {
     // Generate Actionable Recommendations
     const recommendations: string[] = [];
     if (data.openConflictsCount > 0) {
-      recommendations.push(`Resolve ${data.openConflictsCount} open technical or platform contradiction(s).`);
+      recommendations.push(`Resolve ${data.openConflictsCount} open conflicts in the scope.`);
     }
     if (data.totalAssumptionsCount > data.confirmedAssumptionsCount) {
       recommendations.push(

@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
 
     const auth = AuthorizationService.authorize({
       context: { userId, organizationId: orgId, role },
-      action: "VIEW_PROJECT"
+      action: "MANAGE_INTEGRATIONS"
     });
 
     if (!auth.allowed) {

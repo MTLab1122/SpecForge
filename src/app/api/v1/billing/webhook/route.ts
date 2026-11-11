@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    Logger.error("Unhandled Stripe webhook processing error", {
+    Logger.error("Unhandled Stripe webhook processing error", error, {
       context: { error: error.message, stack: error.stack }
     });
 

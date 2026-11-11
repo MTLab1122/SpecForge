@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
 
     const auth = AuthorizationService.authorize({
       context: { userId, organizationId: workspaceId, role },
-      action: "MANAGE_WORKSPACE"
+      action: "MANAGE_INTEGRATIONS"
     });
 
     if (!auth.allowed) {

@@ -252,6 +252,7 @@ export class PlatformEventBus {
 
           Logger.error(
             `Subscriber '${subscriber.subscriberId}' failed for event '${event.id}': ${lastErrorMessage}`,
+            undefined,
             {
               organizationId: event.metadata.workspaceId,
               userId: event.metadata.userId,
@@ -279,8 +280,9 @@ export class PlatformEventBus {
             organizationId: event.metadata.workspaceId,
             userId: event.metadata.userId,
             action: "OUTBOX_EVENT_DEAD_LETTERED",
-            resourceId: event.id,
-            details: {
+            entityName: "OUTBOX_EVENT",
+            entityId: event.id,
+            metadata: {
               eventName: event.eventName,
               domain: event.domain,
               retryCount: event.retryCount,
@@ -354,8 +356,9 @@ export class PlatformEventBus {
       organizationId: options.workspaceId,
       userId: options.operatorUserId,
       action: "DEAD_LETTER_QUEUE_REPLAYED",
-      resourceId: `dlq_batch_${Date.now()}`,
-      details: {
+      entityName: "DLQ_BATCH",
+      entityId: `dlq_batch_${Date.now()}`,
+      metadata: {
         replayedCount: results.replayed,
         eventIds: results.eventIds
       }

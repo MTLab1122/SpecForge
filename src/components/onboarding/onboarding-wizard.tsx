@@ -108,7 +108,7 @@ export function OnboardingWizard({ userId, organizationId, onComplete, onSkip }:
             <div className="space-y-4">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">What best describes your current role?</h2>
-                <p className="text-sm text-slate-500 mt-1">We'll tailor your discovery templates and workflows accordingly.</p>
+                <p className="text-sm text-slate-500 mt-1">We&apos;ll tailor your discovery templates and workflows accordingly.</p>
               </div>
               <div className="grid grid-cols-2 gap-3 pt-2">
                 {[
@@ -173,7 +173,7 @@ export function OnboardingWizard({ userId, organizationId, onComplete, onSkip }:
             <div className="space-y-4">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">What is your typical project scope?</h2>
-                <p className="text-sm text-slate-500 mt-1">We'll load starter templates that match your common project sizes.</p>
+                <p className="text-sm text-slate-500 mt-1">We&apos;ll load starter templates that match your common project sizes.</p>
               </div>
               <div className="grid grid-cols-2 gap-3 pt-2">
                 {[
@@ -261,7 +261,7 @@ export function OnboardingWizard({ userId, organizationId, onComplete, onSkip }:
             <div className="space-y-4">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">What is your #1 goal with SpecForge?</h2>
-                <p className="text-sm text-slate-500 mt-1">We'll prioritize the relevant widgets on your main dashboard.</p>
+                <p className="text-sm text-slate-500 mt-1">We&apos;ll prioritize the relevant widgets on your main dashboard.</p>
               </div>
               <div className="grid grid-cols-2 gap-3 pt-2">
                 {[
@@ -293,7 +293,7 @@ export function OnboardingWizard({ userId, organizationId, onComplete, onSkip }:
             <div className="space-y-5">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">Ready to setup your personalized workspace</h2>
-                <p className="text-sm text-slate-500 mt-1">We've pre-configured your templates and checklist based on your answers.</p>
+                <p className="text-sm text-slate-500 mt-1">We&apos;ve pre-configured your templates and checklist based on your answers.</p>
               </div>
 
               <div className="rounded-xl border border-blue-200 bg-blue-50/60 p-4 space-y-3">
@@ -315,7 +315,7 @@ export function OnboardingWizard({ userId, organizationId, onComplete, onSkip }:
                     onChange={(e) => setFormData({ ...formData, createSampleSandbox: e.target.checked })}
                     className="h-4 w-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300"
                   />
-                  <span>Import "Fintech Mobile MVP" sample project for hands-on practice</span>
+                  <span>Import &quot;Fintech Mobile MVP&quot; sample project for hands-on practice</span>
                 </label>
               </div>
 

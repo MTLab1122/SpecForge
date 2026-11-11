@@ -153,6 +153,7 @@ export interface AuditEventInput {
   ipAddress?: string | null;
   userAgent?: string | null;
   metadata?: Record<string, any>;
+  timestamp?: string;
 }
 
 export class AuditLogger {

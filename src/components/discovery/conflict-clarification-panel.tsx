@@ -161,7 +161,7 @@ export function ConflictClarificationPanel({
               {clar.clientResponse ? (
                 <div className="p-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 space-y-1">
                   <div className="text-[10px] font-bold text-slate-400 uppercase">Client Answer:</div>
-                  <div className="leading-relaxed">"{clar.clientResponse}"</div>
+                  <div className="leading-relaxed">&quot;{clar.clientResponse}&quot;</div>
                 </div>
               ) : (
                 <div className="flex items-center justify-between pt-1">

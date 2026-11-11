@@ -206,7 +206,7 @@ export class SafeIntegrationPlatform {
 
       if (isProhibited) {
         throw new AppError({
-          message: `Security Violation: Excessive or destructive OAuth scope '${scope}' is strictly prohibited for ${provider}. SpecForge adheres to the principle of least privilege and does not permit repository deletion, administrative controls, or record destruction.`,
+          message: `EXCESSIVE_SCOPES_PROHIBITED: Security Violation: Excessive or destructive OAuth scope '${scope}' is strictly prohibited for ${provider}. SpecForge adheres to the principle of least privilege and does not permit repository deletion, administrative controls, or record destruction.`,
           status: 400,
           code: "EXCESSIVE_SCOPES_PROHIBITED"
         });
@@ -215,7 +215,7 @@ export class SafeIntegrationPlatform {
       // Check if scope is within permitted set
       if (!permitted.has(normalized)) {
         throw new AppError({
-          message: `Security Violation: Unrecognized or non-minimal OAuth scope '${scope}' requested for ${provider}. Permitted scopes: [${Array.from(
+          message: `EXCESSIVE_SCOPES_PROHIBITED: Security Violation: Unrecognized or non-minimal OAuth scope '${scope}' requested for ${provider}. Permitted scopes: [${Array.from(
             permitted
           ).join(", ")}].`,
           status: 400,

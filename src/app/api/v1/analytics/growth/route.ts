@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
 
     const auth = AuthorizationService.authorize({
       context: { userId, organizationId: orgId, role },
-      action: "VIEW_FINANCIALS"
+      action: "VIEW_FINANCIAL_DATA"
     });
 
     if (!auth.allowed) {
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
 
     const auth = AuthorizationService.authorize({
       context: { userId, organizationId: orgId, role },
-      action: "MANAGE_WORKSPACE"
+      action: "MANAGE_BILLING"
     });
 
     if (!auth.allowed) {

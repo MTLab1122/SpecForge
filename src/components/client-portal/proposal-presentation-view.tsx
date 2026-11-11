@@ -323,7 +323,7 @@ export const ProposalPresentationView: React.FC<ProposalPresentationViewProps> =
               Approve Full Proposal <ArrowRight className="w-4 h-4" />
             </button>
           </div>
-        </div>
+        </section>
       )}
     </div>
   );

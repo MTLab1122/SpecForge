@@ -10,6 +10,10 @@ import type {
   TaskExportResult,
   AdapterConfig
 } from "./adapter-interface";
+import { GitHubIssuesAdapter } from "./adapters/github-adapter";
+import { JiraCloudAdapter } from "./adapters/jira-adapter";
+import { LinearAdapter } from "./adapters/linear-adapter";
+import { TrelloAdapter } from "./adapters/trello-adapter";
 
 export interface SyncLedgerEntry {
   id: string;
@@ -42,6 +46,20 @@ export class DeliveryHandoverOrchestrator {
 
   public static getAdapter(provider: string): IntegrationAdapter | undefined {
     return this.adapters[provider];
+  }
+
+  private static ensureDefaultAdapter(provider: IntegrationProvider): void {
+    if (this.adapters[provider]) return;
+
+    const adapters: Partial<Record<IntegrationProvider, IntegrationAdapter>> = {
+      GITHUB: new GitHubIssuesAdapter(),
+      JIRA: new JiraCloudAdapter(),
+      LINEAR: new LinearAdapter(),
+      TRELLO: new TrelloAdapter()
+    };
+
+    const adapter = adapters[provider];
+    if (adapter) this.adapters[provider] = adapter;
   }
 
   /**
@@ -77,6 +95,7 @@ export class DeliveryHandoverOrchestrator {
       };
     }
 
+    this.ensureDefaultAdapter(params.provider);
     const adapter = this.adapters[params.provider];
     if (!adapter) {
       return {

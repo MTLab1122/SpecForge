@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getRequestIp } from "@/lib/platform/request-ip";
 import { AuditLogger } from "@/lib/reliability/observability";
 
 let userDevices = [
@@ -47,7 +48,7 @@ export async function PATCH(req: NextRequest) {
       action: isTrusted ? "TRUST_DEVICE" : "UNTRUST_DEVICE",
       entityName: "UserDevice",
       entityId: deviceId,
-      ipAddress: req.ip || "127.0.0.1",
+      ipAddress: getRequestIp(req),
       userAgent: req.headers.get("user-agent")
     });
 

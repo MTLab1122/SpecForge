@@ -4,10 +4,10 @@ import { z } from "zod";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { provider: string } }
+  { params }: { params: Promise<{ provider: string }> }
 ) {
   try {
-    const provider = params.provider.toUpperCase();
+    const provider = (await params).provider.toUpperCase();
     const body = await req.json();
 
     const parsed = ConnectIntegrationSchema.parse({
@@ -32,7 +32,7 @@ export async function POST(
     });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ success: false, errors: error.errors }, { status: 400 });
+      return NextResponse.json({ success: false, errors: error.issues }, { status: 400 });
     }
     return NextResponse.json(
       { success: false, error: error.message || "Failed to connect integration" },

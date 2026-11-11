@@ -81,7 +81,7 @@ export const ChecklistStepKeyEnum = z.enum([
 export const UpdateChecklistStepSchema = z.object({
   stepKey: ChecklistStepKeyEnum,
   isCompleted: z.boolean().default(true),
-  metadata: z.record(z.any()).optional()
+  metadata: z.record(z.string(), z.any()).optional()
 });
 
 // Checklist State Response Interface

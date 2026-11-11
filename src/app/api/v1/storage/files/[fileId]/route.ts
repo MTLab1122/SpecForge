@@ -3,7 +3,7 @@ import { FileLifecycleManager } from "@/lib/storage/file-lifecycle";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
     const orgId = req.headers.get("x-workspace-id") || req.headers.get("x-org-id");
@@ -26,7 +26,7 @@ export async function GET(
         : undefined;
 
       const downloadResult = await FileLifecycleManager.generateDownloadUrl({
-        fileId: params.fileId,
+        fileId: (await params).fileId,
         requestingOrganizationId: orgId,
         requestingUserId: userId,
         requestingRole: role,
@@ -41,10 +41,10 @@ export async function GET(
       });
     }
 
-    const file = FileLifecycleManager.getFile(params.fileId, orgId);
+    const file = FileLifecycleManager.getFile((await params).fileId, orgId);
     if (!file) {
       return NextResponse.json(
-        { success: false, error: `File '${params.fileId}' not found.` },
+        { success: false, error: `File '${(await params).fileId}' not found.` },
         { status: 404 }
       );
     }
@@ -63,7 +63,7 @@ export async function GET(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
     const orgId = req.headers.get("x-workspace-id") || req.headers.get("x-org-id");
@@ -81,7 +81,7 @@ export async function DELETE(
     const reason = body?.reason || "User-initiated file deletion";
 
     const deletedFile = await FileLifecycleManager.deleteFile({
-      fileId: params.fileId,
+      fileId: (await params).fileId,
       requestingOrganizationId: orgId,
       requestingUserId: userId,
       requestingRole: role,
@@ -103,7 +103,7 @@ export async function DELETE(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
     const orgId = req.headers.get("x-workspace-id") || req.headers.get("x-org-id");
@@ -117,7 +117,7 @@ export async function POST(
     }
 
     const result = await FileLifecycleManager.retryUpload({
-      fileId: params.fileId,
+      fileId: (await params).fileId,
       requestingOrganizationId: orgId,
       requestingUserId: userId
     });

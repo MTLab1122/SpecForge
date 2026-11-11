@@ -3,7 +3,7 @@ import { ExportEngine } from "@/lib/storage/export-engine";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { exportId: string } }
+  { params }: { params: Promise<{ exportId: string }> }
 ) {
   try {
     const orgId = req.headers.get("x-workspace-id") || req.headers.get("x-org-id");
@@ -16,10 +16,10 @@ export async function GET(
       );
     }
 
-    const exportRecord = ExportEngine.getExport(params.exportId, orgId);
+    const exportRecord = ExportEngine.getExport((await params).exportId, orgId);
     if (!exportRecord) {
       return NextResponse.json(
-        { success: false, error: `Export '${params.exportId}' not found.` },
+        { success: false, error: `Export '${(await params).exportId}' not found.` },
         { status: 404 }
       );
     }
@@ -38,7 +38,7 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { exportId: string } }
+  { params }: { params: Promise<{ exportId: string }> }
 ) {
   try {
     const orgId = req.headers.get("x-workspace-id") || req.headers.get("x-org-id");
@@ -51,19 +51,19 @@ export async function POST(
       );
     }
 
-    const existing = ExportEngine.getExport(params.exportId, orgId);
+    const existing = ExportEngine.getExport((await params).exportId, orgId);
     if (!existing) {
       return NextResponse.json(
-        { success: false, error: `Export '${params.exportId}' not found.` },
+        { success: false, error: `Export '${(await params).exportId}' not found.` },
         { status: 404 }
       );
     }
 
-    const retried = await ExportEngine.retryExport(params.exportId, userId);
+    const retried = await ExportEngine.retryExport((await params).exportId, userId);
 
     return NextResponse.json({
       success: true,
-      message: `Export '${params.exportId}' re-queued for execution.`,
+      message: `Export '${(await params).exportId}' re-queued for execution.`,
       export: retried
     });
   } catch (error: any) {

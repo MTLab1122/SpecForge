@@ -3,10 +3,10 @@ import { ClientPresentationEngine } from "@/lib/client-portal/presentation-engin
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
-    const shareToken = params.token;
+    const shareToken = (await params).token;
 
     // Demonstration / database lookup mock data
     const rawProposal = {

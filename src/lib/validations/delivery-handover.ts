@@ -52,8 +52,8 @@ export const InternalTaskSchema = z.object({
   milestoneTitle: z.string().optional(),
   featureTitle: z.string().optional(),
   acceptanceCriteria: z.array(z.string()).default([]),
-  tags: z.array(z.string()).default([]),
-  version: z.number().int().positive().default(1),
+  tags: z.array(z.string()).optional(),
+  version: z.number().int().positive().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional()
 });

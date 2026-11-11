@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getRequestIp } from "@/lib/platform/request-ip";
 import { DataProtectionService } from "@/lib/reliability/data-protection";
 import { AuditLogger } from "@/lib/reliability/observability";
 
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
       action: "GDPR_DATA_EXPORTED",
       entityName: "User",
       entityId: userId,
-      ipAddress: req.ip || "127.0.0.1",
+      ipAddress: getRequestIp(req),
       userAgent: req.headers.get("user-agent"),
       metadata: { exportId: exportBundle.exportId, checksum: exportBundle.checksum }
     });

@@ -4,7 +4,7 @@ import { AuthorizationService } from "@/lib/permissions/authorization-service";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { jobId: string } }
+  { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
     const orgId = req.headers.get("x-workspace-id") || req.headers.get("x-org-id");
@@ -18,10 +18,10 @@ export async function GET(
       );
     }
 
-    const job = DurableJobQueue.getJob(params.jobId);
+    const job = DurableJobQueue.getJob((await params).jobId);
     if (!job) {
       return NextResponse.json(
-        { success: false, error: `Job '${params.jobId}' not found.` },
+        { success: false, error: `Job '${(await params).jobId}' not found.` },
         { status: 404 }
       );
     }
@@ -48,7 +48,7 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { jobId: string } }
+  { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
     const orgId = req.headers.get("x-workspace-id") || req.headers.get("x-org-id");
@@ -62,10 +62,10 @@ export async function POST(
       );
     }
 
-    const job = DurableJobQueue.getJob(params.jobId);
+    const job = DurableJobQueue.getJob((await params).jobId);
     if (!job) {
       return NextResponse.json(
-        { success: false, error: `Job '${params.jobId}' not found.` },
+        { success: false, error: `Job '${(await params).jobId}' not found.` },
         { status: 404 }
       );
     }
@@ -77,11 +77,11 @@ export async function POST(
       );
     }
 
-    const retriedJob = await DurableJobQueue.retryJob(params.jobId, userId);
+    const retriedJob = await DurableJobQueue.retryJob((await params).jobId, userId);
 
     return NextResponse.json({
       success: true,
-      message: `Job '${params.jobId}' re-queued for execution.`,
+      message: `Job '${(await params).jobId}' re-queued for execution.`,
       job: retriedJob
     });
   } catch (error: any) {
@@ -94,7 +94,7 @@ export async function POST(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { jobId: string } }
+  { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
     const orgId = req.headers.get("x-workspace-id") || req.headers.get("x-org-id");
@@ -108,10 +108,10 @@ export async function DELETE(
       );
     }
 
-    const job = DurableJobQueue.getJob(params.jobId);
+    const job = DurableJobQueue.getJob((await params).jobId);
     if (!job) {
       return NextResponse.json(
-        { success: false, error: `Job '${params.jobId}' not found.` },
+        { success: false, error: `Job '${(await params).jobId}' not found.` },
         { status: 404 }
       );
     }
@@ -123,11 +123,11 @@ export async function DELETE(
       );
     }
 
-    const cancelledJob = await DurableJobQueue.cancelJob(params.jobId, userId, "Cancelled by user");
+    const cancelledJob = await DurableJobQueue.cancelJob((await params).jobId, userId, "Cancelled by user");
 
     return NextResponse.json({
       success: true,
-      message: `Job '${params.jobId}' cancelled successfully.`,
+      message: `Job '${(await params).jobId}' cancelled successfully.`,
       job: cancelledJob
     });
   } catch (error: any) {

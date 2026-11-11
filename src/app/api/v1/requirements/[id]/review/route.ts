@@ -3,13 +3,13 @@ import { ReviewRequirementItemSchema } from "@/lib/validations/trustworthy-ai";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await req.json();
     const validatedData = ReviewRequirementItemSchema.parse({
       ...body,
-      requirementId: params.id
+      requirementId: (await params).id
     });
 
     const userId = "usr_demo_founder_1";
@@ -44,7 +44,7 @@ export async function POST(
     }
 
     const updatedRequirement = {
-      id: params.id,
+      id: (await params).id,
       reviewState,
       provenance,
       isAssumption,

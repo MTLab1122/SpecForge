@@ -4,10 +4,10 @@ import { z } from "zod";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
-    const shareToken = params.token;
+    const shareToken = (await params).token;
     const body = await req.json();
 
     const parsed = RequestRevisionSchema.parse(body);
@@ -31,7 +31,7 @@ export async function POST(
     });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ success: false, errors: error.errors }, { status: 400 });
+      return NextResponse.json({ success: false, errors: error.issues }, { status: 400 });
     }
     return NextResponse.json(
       { success: false, error: error.message || "Failed to process revision request" },

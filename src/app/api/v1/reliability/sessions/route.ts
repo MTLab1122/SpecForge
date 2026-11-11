@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getRequestIp } from "@/lib/platform/request-ip";
 import { AuditLogger } from "@/lib/reliability/observability";
 
 // Mock/in-memory session list
@@ -44,7 +45,7 @@ export async function DELETE(req: NextRequest) {
         action: "REVOKE_ALL_OTHER_SESSIONS",
         entityName: "UserSession",
         entityId: userId,
-        ipAddress: req.ip || "127.0.0.1",
+        ipAddress: getRequestIp(req),
         userAgent: req.headers.get("user-agent")
       });
       return NextResponse.json({ success: true, message: "All other sessions revoked." });
@@ -62,7 +63,7 @@ export async function DELETE(req: NextRequest) {
       action: "REVOKE_SESSION",
       entityName: "UserSession",
       entityId: sessionId,
-      ipAddress: req.ip || "127.0.0.1",
+      ipAddress: getRequestIp(req),
       userAgent: req.headers.get("user-agent")
     });
 

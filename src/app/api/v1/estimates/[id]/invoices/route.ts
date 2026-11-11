@@ -4,10 +4,10 @@ import { z } from "zod";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const estimateId = params.id;
+    const { id: estimateId } = await params;
 
     // Sample invoices for demonstration / production database lookup
     const invoices = [
@@ -69,10 +69,10 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const estimateId = params.id;
+    const { id: estimateId } = await params;
     const body = await req.json();
 
     const payload = { ...body, estimateId };
@@ -104,7 +104,7 @@ export async function POST(
     });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ success: false, errors: error.errors }, { status: 400 });
+      return NextResponse.json({ success: false, errors: error.issues }, { status: 400 });
     }
     return NextResponse.json(
       { success: false, error: error.message || "Failed to create invoice" },

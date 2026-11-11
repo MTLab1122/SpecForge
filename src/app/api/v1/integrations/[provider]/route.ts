@@ -4,7 +4,7 @@ import { AuthorizationService } from "@/lib/permissions/authorization-service";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { provider: string } }
+  { params }: { params: Promise<{ provider: string }> }
 ) {
   try {
     const orgId = req.headers.get("x-workspace-id") || req.headers.get("x-org-id");
@@ -17,7 +17,7 @@ export async function GET(
       );
     }
 
-    const providerUpper = params.provider.toUpperCase() as IntegrationProvider;
+    const providerUpper = (await params).provider.toUpperCase() as IntegrationProvider;
     const connectionId = `conn_${providerUpper.toLowerCase()}_${orgId}`;
 
     const health = await SafeIntegrationPlatform.healthCheck(connectionId, orgId);
@@ -37,7 +37,7 @@ export async function GET(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { provider: string } }
+  { params }: { params: Promise<{ provider: string }> }
 ) {
   try {
     const orgId = req.headers.get("x-workspace-id") || req.headers.get("x-org-id");
@@ -63,7 +63,7 @@ export async function DELETE(
       );
     }
 
-    const providerUpper = params.provider.toUpperCase() as IntegrationProvider;
+    const providerUpper = (await params).provider.toUpperCase() as IntegrationProvider;
     const connectionId = `conn_${providerUpper.toLowerCase()}_${orgId}`;
 
     await SafeIntegrationPlatform.disconnect({

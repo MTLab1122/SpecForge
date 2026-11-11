@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
         error: {
           code: "VALIDATION_ERROR",
           message: error.message || "Failed to process onboarding profile",
-          details: error.errors || null
+          details: error.issues || null
         }
       },
       { status: 400 }

@@ -156,7 +156,8 @@ describe("Commercial Estimation Engine Unit Tests", () => {
           title: "Quick Fix",
           complexity: "LOW",
           minHours: 5,
-          maxHours: 5
+          maxHours: 5,
+          manualOverride: false
         }
       ];
 

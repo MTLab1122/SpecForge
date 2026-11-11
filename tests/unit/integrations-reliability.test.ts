@@ -17,6 +17,7 @@ describe("Phase 3.6 — Integration Reliability & Two-Way Sync Suite", () => {
     priority: "HIGH",
     status: "TODO",
     estimatedHours: 24,
+    labels: [],
     tags: ["core", "fintech"],
     acceptanceCriteria: ["All ledger entries must balance to zero", "ACID rollback on violation"],
     version: 1,

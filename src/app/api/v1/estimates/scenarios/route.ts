@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ success: false, errors: error.errors }, { status: 400 });
+      return NextResponse.json({ success: false, errors: error.issues }, { status: 400 });
     }
     return NextResponse.json(
       { success: false, error: error.message || "Failed to calculate scenario comparison" },

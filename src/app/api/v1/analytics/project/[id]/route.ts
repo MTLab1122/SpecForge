@@ -3,10 +3,10 @@ import { AnalyticsEngine } from "@/lib/analytics/analytics-engine";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = params.id;
+    const { id: projectId } = await params;
     const organizationId = req.headers.get("x-organization-id") || "org_apex_digital";
 
     // Strict multi-tenant verification would ensure project belongs to organizationId

@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { provider: string } }
+  { params }: { params: Promise<{ provider: string }> }
 ) {
   try {
-    const provider = params.provider.toUpperCase();
+    const provider = (await params).provider.toUpperCase();
 
     return NextResponse.json({
       success: true,

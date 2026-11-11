@@ -3,11 +3,11 @@ import { SupportEngine } from "@/lib/admin/support-engine";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authorUserId = req.headers.get("x-user-id") || "admin_sys";
-    const ticketId = params.id;
+    const { id: ticketId } = await params;
     const body = await req.json();
     const { message, isInternalNote = false } = body;
 

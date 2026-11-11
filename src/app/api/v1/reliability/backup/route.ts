@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getRequestIp } from "@/lib/platform/request-ip";
 import { DisasterRecoveryOrchestrator } from "@/lib/reliability/disaster-recovery";
 import { AuditLogger } from "@/lib/reliability/observability";
 
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
         action: "BACKUP_RESTORE_VERIFIED",
         entityName: "DatabaseBackupSnapshot",
         entityId: snapshotId,
-        ipAddress: req.ip || "127.0.0.1",
+        ipAddress: getRequestIp(req),
         userAgent: req.headers.get("user-agent"),
         metadata: { isValid: verification.isValid, latencyMs: verification.latencyMs }
       });
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
       action: "BACKUP_SNAPSHOT_CREATED",
       entityName: "DatabaseBackupSnapshot",
       entityId: snapshot.snapshotId,
-      ipAddress: req.ip || "127.0.0.1",
+      ipAddress: getRequestIp(req),
       userAgent: req.headers.get("user-agent"),
       metadata: { checksum: snapshot.checksumSha256, sizeBytes: snapshot.sizeBytes }
     });

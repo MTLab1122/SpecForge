@@ -5,10 +5,10 @@ import { z } from "zod";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const estimateId = params.id;
+    const { id: estimateId } = await params;
 
     const estimatedTotalHours = 120;
     const actualTotalHours = 142;
@@ -49,10 +49,10 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const estimateId = params.id;
+    const { id: estimateId } = await params;
     const body = await req.json();
 
     const parsed = AccuracyFeedbackInputSchema.parse(body);
@@ -90,7 +90,7 @@ export async function POST(
     });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ success: false, errors: error.errors }, { status: 400 });
+      return NextResponse.json({ success: false, errors: error.issues }, { status: 400 });
     }
     return NextResponse.json(
       { success: false, error: error.message || "Failed to process accuracy feedback" },

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpecForge | Discovery & Scope OS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glass-backdrop { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 antialiased selection:bg-blue-500 selection:text-white">
+
+  <!-- TOP LIVE DEMO BANNER -->
+  <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white px-4 py-2 text-xs font-semibold flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-2 max-w-7xl mx-auto w-full justify-between">
+      <div class="flex items-center gap-2">
+        <span class="flex h-2 w-2 relative">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span>SpecForge Production Showcase • Live 24/7 Preview</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/MTLab1122/SpecForge" target="_blank" class="inline-flex items-center gap-1.5 bg-white/15 hover:bg-white/25 px-2.5 py-1 rounded-lg text-[11px] font-bold transition">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>View on GitHub</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-6 py-3.5 shadow-2xs">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-9 w-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-base shadow-sm">
+          ⚡
+        </div>
+        <div>
+          <span class="text-base font-extrabold text-slate-900 tracking-tight">SpecForge</span>
+          <span class="text-[11px] text-slate-400 font-semibold block -mt-1">Discovery & Scope OS</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="openModal('onboardingModal')" class="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold transition">
+          <svg class="h-3.5 w-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <span>Restart Onboarding Tour</span>
+        </button>
+
+        <a href="https://github.com/MTLab1122/SpecForge#quick-start" target="_blank" class="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition">
+          Deploy 24/7
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN DASHBOARD CONTENT -->
+  <main class="max-w-7xl mx-auto px-6 pt-8 pb-20 space-y-8">
+
+    <!-- WELCOME ROW -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Workspace Overview</h1>
+        <p class="text-xs text-slate-500 mt-1.5 font-medium">
+          Turn messy client briefs, PDFs, and WhatsApp voice notes into client-approved scopes, defensible P80 estimates, and delivery tasks.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="simulateNewProject()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition">
+          <span>+ New Project Brief</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- CONTINUE WHERE YOU LEFT OFF BANNER -->
+    <div class="rounded-2xl border-2 border-blue-200 bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-white p-6 shadow-xs hover:shadow-md transition">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <div class="space-y-2">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full">
+              Continue Where You Left Off
+            </span>
+            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full border bg-emerald-100 text-emerald-800 border-emerald-200">
+              Estimation Matrix
+            </span>
+            <span class="text-xs text-slate-400 font-medium">• 12m ago</span>
+          </div>
+
+          <h3 class="text-xl font-bold text-slate-900">
+            Fintech Mobile MVP (Sandbox) <span class="text-sm font-semibold text-slate-500">for Alpha Bank Digital</span>
+          </h3>
+
+          <p class="text-xs text-slate-600 font-medium">
+            Last Action: <span class="font-bold text-slate-800">Applied P80 Contingency (18%) and Senior Architect Rate Card ($150/hr)</span>
+          </p>
+
+          <!-- Mini Progress Bar -->
+          <div class="flex items-center gap-3 pt-2 max-w-sm">
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div id="projectProgressBar" class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: 65%;"></div>
+            </div>
+            <span id="projectProgressLabel" class="text-xs font-bold text-slate-700 shrink-0">65% Complete</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 shrink-0">
+          <button onclick="openModal('estimateModal')" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md hover:shadow-lg transition">
+            <span>Open P80 Estimator</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN GRID: ACTIVATION CHECKLIST + RECENT PROJECTS -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- LEFT COLUMN: ACTIVATION CHECKLIST -->
+      <div class="lg:col-span-1 space-y-6">
+        <div class="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
+          <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="relative w-9 h-9 shrink-0 flex items-center justify-center">
+                <svg class="w-9 h-9 transform -rotate-90" width="36" height="36" viewBox="0 0 36 36">
+                  <path class="text-slate-200" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path class="text-blue-600" stroke-dasharray="70, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <span class="absolute text-[11px] font-extrabold text-slate-800">70%</span>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-slate-900">Activation Checklist</h3>
+                <span class="text-[10px] font-bold text-blue-600">7 / 10 Steps Complete</span>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Live</span>
+          </div>
+
+          <div class="p-4 space-y-2 text-xs">
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 text-slate-500 font-medium line-through">
+              <span>✓ 1. Create Workspace</span>
+              <span class="text-[10px] text-slate-400">Done</span>
+            </div>
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 text-slate-500 font-medium line-through">
+              <span>✓ 2. Ingest Audio/PDF Brief</span>
+              <span class="text-[10px] text-slate-400">Done</span>
+            </div>
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 text-slate-500 font-medium line-through">
+              <span>✓ 3. Grounded AI Extraction</span>
+              <span class="text-[10px] text-slate-400">Done</span>
+            </div>
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 text-slate-500 font-medium line-through">
+              <span>✓ 4. Freeze Scope Version v1</span>
+              <span class="text-[10px] text-slate-400">Done</span>
+            </div>
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 text-slate-500 font-medium line-through">
+              <span>✓ 5. Build P80 Contingency Estimate</span>
+              <span class="text-[10px] text-slate-400">Done</span>
+            </div>
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-blue-50/70 border border-blue-200 text-blue-900 font-bold">
+              <span>⚡ 6. Client Digital Sign-Off</span>
+              <button onclick="openModal('portalModal')" class="text-blue-600 hover:text-blue-800 font-extrabold">Simulate →</button>
+            </div>
+            <div class="flex items-center justify-between p-2.5 rounded-xl border border-slate-150 text-slate-700 font-medium">
+              <span>7. Task Delivery Handover</span>
+              <button onclick="openModal('handoverModal')" class="text-slate-500 hover:text-blue-600 font-semibold">View →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 24/7 PRODUCTION HEALTH PROBE CARD -->
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">24/7 High-Availability Health</h4>
+            <span class="flex h-2 w-2 rounded-full bg-emerald-500"></span>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500 font-medium">Database Node</span>
+              <span class="font-bold text-emerald-600">PostgreSQL (UP)</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500 font-medium">Downstream Circuit Breakers</span>
+              <span class="font-bold text-slate-800">12 / 12 Healthy</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500 font-medium">Target Availability</span>
+              <span class="font-bold text-slate-800">99.95% SLO</span>
+            </div>
+            <div class="flex justify-between py-1">
+              <span class="text-slate-500 font-medium">SHA-256 Audit Seal</span>
+              <span class="font-mono text-[10px] text-blue-600">Active</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: RECENT PROJECTS & INTERACTIVE SCOPE PREVIEWS -->
+      <div class="lg:col-span-2 space-y-6">
+
+        <!-- PROJECT CARDS -->
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Active Workspace Projects</h3>
+            <span class="text-xs font-semibold text-slate-500">3 Verified Scopes</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Card 1 -->
+            <div onclick="openModal('estimateModal')" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs hover:shadow-md hover:border-blue-300 cursor-pointer transition space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Estimating</span>
+                <span class="text-[10px] text-slate-400 font-medium">12m ago</span>
+              </div>
+              <h4 class="text-sm font-bold text-slate-900 leading-snug">Fintech Mobile MVP</h4>
+              <p class="text-[11px] text-slate-500">Alpha Bank Digital</p>
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
+                <span class="text-slate-400 font-normal">8 Features</span>
+                <span class="text-blue-600">USD $18,500</span>
+              </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div onclick="openModal('portalModal')" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs hover:shadow-md hover:border-blue-300 cursor-pointer transition space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">Scope v1.0</span>
+                <span class="text-[10px] text-slate-400 font-medium">2h ago</span>
+              </div>
+              <h4 class="text-sm font-bold text-slate-900 leading-snug">Headless Storefront</h4>
+              <p class="text-[11px] text-slate-500">Acme Retail Group</p>
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
+                <span class="text-slate-400 font-normal">5 Features</span>
+                <span class="text-blue-600">USD $9,200</span>
+              </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div onclick="openModal('portalModal')" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs hover:shadow-md hover:border-blue-300 cursor-pointer transition space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-800">Proposal Sent</span>
+                <span class="text-[10px] text-slate-400 font-medium">1d ago</span>
+              </div>
+              <h4 class="text-sm font-bold text-slate-900 leading-snug">AI Real Estate CRM</h4>
+              <p class="text-[11px] text-slate-500">RealtyPulse Inc.</p>
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
+                <span class="text-slate-400 font-normal">11 Features</span>
+                <span class="text-blue-600">PKR 850,000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CORE 11-STAGE DELIVERY PIPELINE CARD -->
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-900">Deterministic 11-Stage Workflow Invariant</h3>
+            <span class="text-[10px] font-bold text-slate-400">Zero-Bypass Architecture</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+              <div class="text-xl">📥</div>
+              <div class="font-bold text-slate-800 mt-1">1. Discovery</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Audio & PDF Ingestion</div>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+              <div class="text-xl">🔍</div>
+              <div class="font-bold text-slate-800 mt-1">2. AI Extraction</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Exact Provenance</div>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+              <div class="text-xl">📊</div>
+              <div class="font-bold text-slate-800 mt-1">3. P80 Estimation</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Defensible Rates</div>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+              <div class="text-xl">✍️</div>
+              <div class="font-bold text-slate-800 mt-1">4. Client Sign-Off</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">SHA-256 Audit Seal</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL 1: ONBOARDING WIZARD -->
+  <div id="onboardingModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 glass-backdrop p-4 hidden">
+    <div class="w-full max-w-xl rounded-2xl bg-white shadow-2xl border border-slate-100 overflow-hidden">
+      <div class="bg-slate-50 px-8 py-5 border-b border-slate-200 flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Personalize Workspace • Step 1 of 6</span>
+        <button onclick="closeModal('onboardingModal')" class="text-xs font-semibold text-slate-400 hover:text-slate-600">✕ Close</button>
+      </div>
+      <div class="p-8 space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">What best describes your current role?</h2>
+          <p class="text-xs text-slate-500 mt-1">We'll tailor your discovery templates and workflows accordingly.</p>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="p-4 rounded-xl border-2 border-blue-600 bg-blue-50/50 cursor-pointer">
+            <h4 class="text-xs font-bold text-blue-900">Freelance Developer</h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">Delivering custom web & mobile software</p>
+          </div>
+          <div class="p-4 rounded-xl border border-slate-200 hover:border-slate-300 bg-white cursor-pointer">
+            <h4 class="text-xs font-bold text-slate-800">Software Agency</h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">Boutique development shop with a team</p>
+          </div>
+          <div class="p-4 rounded-xl border border-slate-200 hover:border-slate-300 bg-white cursor-pointer">
+            <h4 class="text-xs font-bold text-slate-800">Product Manager</h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">Managing scopes, roadmaps & backlogs</p>
+          </div>
+          <div class="p-4 rounded-xl border border-slate-200 hover:border-slate-300 bg-white cursor-pointer">
+            <h4 class="text-xs font-bold text-slate-800">Technical Consultant</h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">Advising clients on architecture & RFPs</p>
+          </div>
+        </div>
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+          <button onclick="closeModal('onboardingModal')" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition">
+            Continue to Workspace →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: INTERACTIVE P80 ESTIMATOR -->
+  <div id="estimateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 glass-backdrop p-4 hidden">
+    <div class="w-full max-w-2xl rounded-2xl bg-white shadow-2xl border border-slate-100 overflow-hidden">
+      <div class="bg-slate-50 px-8 py-5 border-b border-slate-200 flex items-center justify-between">
+        <div>
+          <h3 class="text-sm font-bold text-slate-900">P80 Contingency Estimator</h3>
+          <p class="text-[11px] text-slate-500">Fintech Mobile MVP (Sandbox)</p>
+        </div>
+        <button onclick="closeModal('estimateModal')" class="text-xs font-semibold text-slate-400 hover:text-slate-600">✕ Close</button>
+      </div>
+      <div class="p-8 space-y-6 text-xs">
+        <div class="bg-blue-50/70 border border-blue-200 rounded-xl p-4 space-y-1">
+          <span class="font-bold text-blue-900">Monte Carlo Risk Contingency Buffer</span>
+          <p class="text-blue-700">Adjust contingency buffer to protect agency margin against API delays & client revisions.</p>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex justify-between font-bold">
+            <span>Contingency Buffer:</span>
+            <span id="contingencyValue" class="text-blue-600">18%</span>
+          </div>
+          <input type="range" min="0" max="40" value="18" id="contingencySlider" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" oninput="updateEstimate(this.value)">
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="text-slate-400 font-semibold block">Base Dev Hours</span>
+            <span class="text-lg font-extrabold text-slate-800">100 hrs</span>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="text-slate-400 font-semibold block">Hourly Rate</span>
+            <span class="text-lg font-extrabold text-slate-800">$150/hr</span>
+          </div>
+          <div class="p-3 bg-blue-50 rounded-xl border border-blue-200">
+            <span class="text-blue-600 font-semibold block">Total Client Price</span>
+            <span id="totalEstimatePrice" class="text-lg font-extrabold text-blue-700">$17,700</span>
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-slate-100">
+          <button onclick="closeModal('estimateModal'); openModal('portalModal')" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition">
+            Generate Branded Client Proposal →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: CLIENT APPROVAL PORTAL SIMULATOR -->
+  <div id="portalModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 glass-backdrop p-4 hidden">
+    <div class="w-full max-w-2xl rounded-2xl bg-white shadow-2xl border border-slate-100 overflow-hidden">
+      <div class="bg-indigo-900 text-white px-8 py-5 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300">Client Review Portal</span>
+          <h3 class="text-base font-bold">Proposal #PRP-2026-084</h3>
+        </div>
+        <button onclick="closeModal('portalModal')" class="text-xs text-indigo-300 hover:text-white">✕ Close</button>
+      </div>
+      <div class="p-8 space-y-5 text-xs">
+        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50 space-y-2">
+          <h4 class="font-bold text-slate-800">Agreed Deliverables Summary</h4>
+          <ul class="list-disc list-inside space-y-1 text-slate-600">
+            <li>Biometric FaceID & TouchID Authentication Module</li>
+            <li>Real-time SEPA & Faster Payments Core Rail Integration</li>
+            <li>Encrypted SQLite Offline Transaction Vault</li>
+            <li>WCAG 2.1 AA Compliant Accessible High-Contrast Interface</li>
+          </ul>
+        </div>
+
+        <div class="rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="text-emerald-600 font-bold">🔒 Cryptographic Audit Seal</span>
+            <span class="text-[10px] bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full font-mono">SHA-256</span>
+          </div>
+          <p id="hashDigest" class="font-mono text-[11px] text-emerald-800 break-all bg-white p-2.5 rounded-lg border border-emerald-200">
+            e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+          </p>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+          <button onclick="signProposal()" id="approveBtn" class="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition">
+            Sign & Approve Full Proposal ✓
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: HANDOVER TASK BOARD -->
+  <div id="handoverModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 glass-backdrop p-4 hidden">
+    <div class="w-full max-w-2xl rounded-2xl bg-white shadow-2xl border border-slate-100 overflow-hidden">
+      <div class="bg-slate-50 px-8 py-5 border-b border-slate-200 flex items-center justify-between">
+        <div>
+          <h3 class="text-sm font-bold text-slate-900">Task Handover & Tool Dispatch</h3>
+          <p class="text-[11px] text-slate-500">Atomic task generation from approved scope criteria</p>
+        </div>
+        <button onclick="closeModal('handoverModal')" class="text-xs font-semibold text-slate-400 hover:text-slate-600">✕ Close</button>
+      </div>
+      <div class="p-8 space-y-4 text-xs">
+        <div class="grid grid-cols-3 gap-3">
+          <div class="p-3 border rounded-xl bg-slate-50 border-slate-200 text-center">
+            <span class="font-bold text-slate-800 block">Linear</span>
+            <span class="text-[10px] text-emerald-600 font-bold">Connected ✓</span>
+          </div>
+          <div class="p-3 border rounded-xl bg-slate-50 border-slate-200 text-center">
+            <span class="font-bold text-slate-800 block">Jira Cloud</span>
+            <span class="text-[10px] text-emerald-600 font-bold">Connected ✓</span>
+          </div>
+          <div class="p-3 border rounded-xl bg-slate-50 border-slate-200 text-center">
+            <span class="font-bold text-slate-800 block">GitHub Issues</span>
+            <span class="text-[10px] text-emerald-600 font-bold">Connected ✓</span>
+          </div>
+        </div>
+
+        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-2">
+          <span class="font-bold text-slate-700">Generated Sprint Tasks:</span>
+          <div class="space-y-1.5 font-mono text-[11px]">
+            <div class="p-2 bg-white rounded border border-slate-200 flex justify-between">
+              <span>[LIN-149] Setup Biometric KeyChain & FaceID Adapter</span>
+              <span class="text-blue-600 font-bold">16h</span>
+            </div>
+            <div class="p-2 bg-white rounded border border-slate-200 flex justify-between">
+              <span>[LIN-150] Integrate SEPA ISO 20022 XML Message Parser</span>
+              <span class="text-blue-600 font-bold">24h</span>
+            </div>
+            <div class="p-2 bg-white rounded border border-slate-200 flex justify-between">
+              <span>[LIN-151] Implement SQLite AES-256 DB Migration Script</span>
+              <span class="text-blue-600 font-bold">18h</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-3 border-t border-slate-100">
+          <button onclick="closeModal('handoverModal')" class="px-5 py-2.5 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function updateEstimate(contingency) {
+      document.getElementById('contingencyValue').innerText = contingency + '%';
+      const baseHours = 100;
+      const rate = 150;
+      const total = (baseHours * rate) * (1 + (parseInt(contingency) / 100));
+      document.getElementById('totalEstimatePrice').innerText = '$' + total.toLocaleString();
+    }
+
+    function signProposal() {
+      const btn = document.getElementById('approveBtn');
+      const hashBox = document.getElementById('hashDigest');
+      btn.innerText = 'Approved & Sealed ✓';
+      btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+      btn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+      
+      // Generate realistic SHA-256 simulation
+      const randomHash = Array.from(crypto.getRandomValues(new Uint8Array(32)))
+        .map(b => b.toString(16).padStart(2, '0')).join('');
+      hashBox.innerText = randomHash + ' (VERIFIED)';
+      
+      setTimeout(() => {
+        alert('Proposal Approved! Digital SHA-256 audit seal registered in tamper-proof ledger.');
+        closeModal('portalModal');
+      }, 500);
+    }
+
+    function simulateNewProject() {
+      openModal('onboardingModal');
+    }
+  </script>
+</body>
+</html>

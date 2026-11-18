@@ -40,7 +40,7 @@ export const CreateCommentSchema = z.object({
       z.object({
         fileName: z.string(),
         fileUrl: z.string().url(),
-        fileSizeBytes: z.number().int().positive(),
+        fileSizeBytes: z.number().positive(),
         mimeType: z.string()
       })
     )
@@ -60,7 +60,7 @@ export const PresenceHeartbeatSchema = z.object({
   projectId: z.string().uuid(),
   activeSection: z.enum(["SCOPE_BUILDER", "ESTIMATE_BUILDER", "TASKS", "PROPOSAL_PREVIEW", "OVERVIEW"]),
   lockedItemId: z.string().optional(), // ID of story or estimate item actively being edited
-  clientVersion: z.number().int().default(1)
+  clientVersion: z.number().default(1)
 });
 
 export const AcquireLockSchema = z.object({
@@ -86,8 +86,8 @@ export const FilterActivityFeedSchema = z.object({
   searchQuery: z.string().optional(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
-  page: z.number().int().default(1),
-  pageSize: z.number().int().default(20)
+  page: z.number().default(1),
+  pageSize: z.number().default(20)
 });
 
 // ============================================================================

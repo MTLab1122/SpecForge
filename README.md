@@ -6,15 +6,22 @@
 
 *Turn messy client briefs, PDFs, and WhatsApp voice notes into client-approved scopes, defensible P80 estimates, and executable Jira/Linear sprint tasks.*
 
+<p align="center">
+  <a href="https://mtlab1122.github.io/SpecForge/">
+    <img src="https://img.shields.io/badge/🌐_LIVE_DEMO-mtlab1122.github.io%2FSpecForge-blue?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Demo" />
+  </a>
+</p>
+
+[![Live Demo](https://img.shields.io/badge/Live_Showcase-GitHub_Pages-2ea44f?logo=github)](https://mtlab1122.github.io/SpecForge/)
 [![CI/CD](https://github.com/MTLab1122/SpecForge/actions/workflows/ci.yml/badge.svg)](https://github.com/MTLab1122/SpecForge/actions)
-[![Next.js](https://img.shields.io/badge/Next.js-14.2.3-black?logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.5-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38bdf8?logo=tailwind-css)](https://tailwindcss.com/)
 [![Prisma ORM](https://img.shields.io/badge/Prisma-5.22.0-2D3748?logo=prisma)](https://www.prisma.io/)
 [![WCAG 2.1 AA](https://img.shields.io/badge/Accessibility-WCAG_2.1_AA-success)](https://www.w3.org/WAI/WCAG21/quickref/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[Live Demo](#247-production-deployment-guide) • [Core Workflow](#core-product-invariant-workflow) • [Key Capabilities](#key-capabilities) • [Quick Start](#quick-start) • [Deployment](#247-production-deployment-guide) • [Architecture](#architecture--security)
+[🌐 Live Interactive Demo](https://mtlab1122.github.io/SpecForge/) • [Core Workflow](#core-product-invariant-workflow) • [Key Capabilities](#key-capabilities) • [Quick Start](#quick-start) • [24/7 Deployment](#247-production-deployment-guide) • [Architecture](#architecture--security)
 
 </div>
 

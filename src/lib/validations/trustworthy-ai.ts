@@ -66,13 +66,13 @@ export const CreateScopeVersionSchema = z.object({
 
 export const CompareScopeVersionsSchema = z.object({
   projectId: z.string().uuid(),
-  versionA: z.number().int().positive(),
-  versionB: z.number().int().positive()
+  versionA: z.number().min(1),
+  versionB: z.number().min(1)
 });
 
 export const RestoreScopeVersionSchema = z.object({
   projectId: z.string().uuid(),
-  targetVersionNumber: z.number().int().positive(),
+  targetVersionNumber: z.number().min(1),
   reason: z.string().min(3)
 });
 

@@ -31,8 +31,8 @@ export type SubmitDiscoveryQuestionnaireInput = z.infer<typeof SubmitDiscoveryQu
 export const PrioritizeRequirementSchema = z.object({
   requirementId: z.string().uuid(),
   moscow: MoscowPriorityEnum,
-  businessValue: z.number().int().min(1).max(5),
-  complexityScore: z.number().int().min(1).max(5),
+  businessValue: z.number().min(1).max(5),
+  complexityScore: z.number().min(1).max(5),
   dependsOnIds: z.array(z.string()).default([]),
   blocksIds: z.array(z.string()).default([])
 });
@@ -57,7 +57,7 @@ export const CreateUserFlowSchema = z.object({
   description: z.string().min(5),
   steps: z.array(
     z.object({
-      stepNumber: z.number().int().positive(),
+      stepNumber: z.number().positive(),
       action: z.string().min(2),
       screen: z.string().min(2)
     })
@@ -73,8 +73,8 @@ export const CreateUserFlowSchema = z.object({
 
 export const CompareScopeVersionsRequestSchema = z.object({
   projectId: z.string().uuid(),
-  versionA: z.number().int().positive(),
-  versionB: z.number().int().positive(),
+  versionA: z.number().positive(),
+  versionB: z.number().positive(),
   hourlyRate: z.number().positive().optional(),
   currency: z.string().default("USD")
 });

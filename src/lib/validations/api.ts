@@ -186,7 +186,7 @@ export const UpdateIntegrationMappingsSchema = z.object({
 // ============================================================================
 
 export const PurchaseCreditTopUpSchema = z.object({
-  creditsAmount: z.number().int().positive(),
+  creditsAmount: z.number().positive(),
   paymentMethod: z.enum(["stripe", "jazzcash", "easypaisa"]),
   returnUrl: z.string().url()
 });

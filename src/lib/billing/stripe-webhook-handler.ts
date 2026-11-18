@@ -227,7 +227,7 @@ export class StripeWebhookHandler {
         case "customer.subscription.created": {
           const sub = event.data.object;
           const organizationId = sub.metadata?.organizationId || sub.customer;
-          const targetTier = (sub.metadata?.planTier || "PROFESSIONAL").toUpperCase() as SubscriptionTier;
+          const targetTier = (sub.metadata?.planTier || sub.metadata?.tier || "PROFESSIONAL").toUpperCase() as SubscriptionTier;
 
           BillingService.updateSubscriptionState(organizationId, {
             tier: targetTier,
@@ -254,7 +254,7 @@ export class StripeWebhookHandler {
         case "customer.subscription.updated": {
           const sub = event.data.object;
           const organizationId = sub.metadata?.organizationId || sub.customer;
-          const targetTier = (sub.metadata?.planTier || "PROFESSIONAL").toUpperCase() as SubscriptionTier;
+          const targetTier = (sub.metadata?.planTier || sub.metadata?.tier || "PROFESSIONAL").toUpperCase() as SubscriptionTier;
 
           const isPastDue = sub.status === "past_due";
           const isActive = sub.status === "active";

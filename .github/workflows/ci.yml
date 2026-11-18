@@ -31,7 +31,7 @@ jobs:
         run: npm run typecheck
 
       - name: Execute Master Launch-Readiness Verification
-        run: node scratch/verify-launch-readiness-master.mjs
+        run: npx tsx scratch/verify-launch-readiness-master.mjs
 
       - name: Next.js Production Build
         run: npm run build
